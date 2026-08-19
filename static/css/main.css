@@ -1,0 +1,1068 @@
+/*
+ * Site-wide design tokens and component styles.
+ * Bootstrap 5 provides layout/grid/utilities; this file supplies the
+ * project's visual identity (color, type, spacing) on top of it.
+ *
+ * Theme: dark, premium analytics/BI product. Spotify green (--color-primary)
+ * is a restricted accent — active nav state, primary CTAs, chart highlights,
+ * and glow effects only. Everything else stays white/slate so the accent
+ * keeps its impact instead of becoming another background color.
+ */
+
+:root {
+  --color-primary: #1ED760;
+  --color-primary-dark: #17b34e;
+  --color-primary-text-on: #04140a; /* text color used ON TOP of the bright green fill */
+
+  --color-ink: #f8fafc;      /* headings: near-white */
+  --color-body: #cbd5e1;     /* body copy: slate-300 — ~13:1 contrast on --color-surface */
+  --color-muted: #94a3b8;    /* secondary/caption text: slate-400 — ~7.7:1 contrast */
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  --color-surface: #0a0a0f;      /* page background: near-black */
+  --color-surface-alt: #0d0d12;  /* alternating section background: subtly lighter */
+  --color-card: #14141a;         /* card/panel surface: lifted off the page background */
+
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --chip-bg: rgba(255, 255, 255, 0.06); /* neutral fill for icon circles/badges — NOT green */
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.85rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px rgba(30, 215, 96, 0.18), 0 8px 28px rgba(30, 215, 96, 0.12);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --navbar-height: 4.25rem;
+
+  /* Spacing scale — component paddings/gaps pull from this instead of
+     one-off values, so density stays consistent as new pages are added. */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.75rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Disables the browser's automatic scroll-anchoring. Without this, when
+     content above the viewport changes size after initial paint, the
+     browser silently scrolls the page to compensate, landing on a blank
+     gap between sections. Reported live as "the Project page looks
+     blank" — the DOM is always there, the viewport was just scrolled
+     past it. */
+  overflow-anchor: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-body);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+  padding-top: var(--navbar-height); /* compensates for the fixed navbar */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* --- Bootstrap primary color override -------------------------------- */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-text-on);
+  font-weight: 600;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-primary-text-on);
+}
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-outline-primary:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-text-on);
+}
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+/* --- Navbar ------------------------------------------------------------ */
+/* Fixed + transparent at top; JS (main.js) toggles .navbar-scrolled once
+   the page scrolls, which brings in the blurred dark panel + border. */
+.site-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+.site-navbar.navbar-scrolled {
+  background-color: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: var(--color-border);
+}
+.site-navbar .navbar-brand {
+  color: var(--color-ink);
+  font-size: 1.15rem;
+}
+.site-navbar .nav-link {
+  position: relative;
+  color: var(--color-body);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: color 0.15s ease;
+}
+.site-navbar .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.05rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  box-shadow: 0 0 8px rgba(30, 215, 96, 0.65);
+  opacity: 0;
+  transform: scaleX(0.6);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link.active,
+.site-navbar .nav-link.show {
+  color: #ffffff;
+}
+.site-navbar .nav-link.active {
+  font-weight: 600;
+}
+.site-navbar .nav-link:hover::after,
+.site-navbar .nav-link.active::after,
+.site-navbar .nav-link.show::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.site-navbar .dropdown-menu {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.site-navbar .dropdown-item {
+  color: var(--color-body);
+}
+.site-navbar .dropdown-item:hover,
+.site-navbar .dropdown-item:focus {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+.site-navbar .navbar-toggler {
+  border-color: var(--color-border);
+}
+.site-navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.85)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* --- Footer -------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  background-color: var(--color-surface-alt);
+  margin-top: auto;
+}
+/* Thin gradient glow replaces a flat border-top — a small, decorative use
+   of the accent as a divider, not a fill. */
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(30, 215, 96, 0.5), transparent);
+}
+.footer-text {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  max-width: 32rem;
+}
+.footer-text a {
+  color: var(--color-primary);
+}
+.footer-text a:hover {
+  text-decoration: underline;
+}
+.footer-links {
+  margin: 0;
+}
+.footer-links li {
+  margin-bottom: 0.55rem;
+}
+.footer-links a {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+.footer-links a:hover {
+  color: #ffffff;
+}
+.footer-bottom {
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+.footer-back-to-top {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.15s ease;
+}
+.footer-back-to-top:hover {
+  color: var(--color-primary);
+}
+
+/* --- Section header ------------------------------------------------------ */
+.section-eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+.section-title {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  margin-bottom: 0.5rem;
+}
+.section-subtitle {
+  color: var(--color-muted);
+  font-size: 1rem;
+  max-width: 40rem;
+}
+
+/* --- Cards ---------------------------------------------------------------
+   Gradient border via the classic double-background trick: one opaque
+   layer clipped to the padding box (the actual card fill) and a gradient
+   layer clipped to the border box (visible only in the 1px border ring).
+   The green only ever shows as a thin border tint + hover glow — never a
+   fill — so it stays a restricted accent even though this card shell is
+   reused on every page. */
+.app-card {
+  --card-border-gradient: linear-gradient(135deg, rgba(30, 215, 96, 0.4), rgba(255, 255, 255, 0.07) 55%);
+  position: relative;
+  background: linear-gradient(var(--color-card), var(--color-card)) padding-box, var(--card-border-gradient) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.app-card:hover {
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+  transform: translateY(-3px);
+}
+.app-card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--chip-bg);
+  color: var(--color-ink);
+  font-size: 1.25rem;
+  margin-bottom: var(--space-md);
+}
+.app-card-title {
+  font-size: 1.05rem;
+  margin-bottom: var(--space-xs);
+}
+.app-card-text {
+  font-size: 0.9rem;
+  color: var(--color-body);
+  margin-bottom: 0;
+}
+
+/* --- Page section layout helpers ----------------------------------------- */
+.page-section {
+  padding: var(--space-2xl) 0;
+}
+.page-section-alt {
+  background-color: var(--color-surface-alt);
+}
+.page-hero {
+  padding: 4.5rem 0 3.5rem;
+}
+/* Pulls a hero section up and behind the fixed transparent navbar so the
+   navbar overlays it edge-to-edge until the user scrolls. */
+.hero-full-bleed {
+  margin-top: calc(var(--navbar-height) * -1);
+  padding-top: calc(var(--navbar-height) + 3rem);
+}
+
+/* --- Scroll reveal --------------------------------------------------------
+   Elements are visible by default. Only once JS confirms IntersectionObserver
+   support AND the user has not requested reduced motion does it "arm" the
+   hidden-until-visible state, so a no-JS or reduced-motion visitor always
+   sees full content immediately. */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+.reveal-armed .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-armed .reveal.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+.reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-armed .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- Hero waveform ----------------------------------------------------------
+   Abstract, ambient sine-wave pattern behind the hero text — not a literal
+   EQ/player visualizer. Two identical SVGs placed side by side and drifted
+   by -50% create a seamless infinite loop. */
+.hero-waveform {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.12;
+}
+.hero-waveform-track {
+  display: flex;
+  width: 200%;
+  animation: hero-waveform-drift 18s linear infinite;
+}
+.hero-waveform-svg {
+  width: 50%;
+  height: 140px;
+  flex-shrink: 0;
+}
+@keyframes hero-waveform-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-waveform-track {
+    animation: none;
+  }
+}
+
+/* --- Hero stat cards (glass) ----------------------------------------------- */
+.hero-stat-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  height: 100%;
+}
+.hero-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+.hero-stat-label {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Architecture flow diagram ---------------------------------------------
+   Two motion cues make the pipeline read as "alive" without touching the
+   template's flow/label structure: a pulse ring that sweeps stage-to-stage
+   (via --stage-index, set inline per card from the loop counter) and a
+   small glowing dot that travels along each connector arrow. Both freeze
+   under reduced motion — the pulse ring and dot simply stop animating and
+   the static icon/arrow stays exactly as readable as before. */
+.architecture-step {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.architecture-step .app-card-icon {
+  position: relative;
+}
+.architecture-step .app-card-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(30, 215, 96, 0.35);
+  animation: architecture-pulse 2.8s ease-out infinite;
+  animation-delay: calc(var(--stage-index, 0) * 0.3s);
+}
+@keyframes architecture-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 215, 96, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(30, 215, 96, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 215, 96, 0);
+  }
+}
+
+.architecture-arrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  font-size: 1.35rem;
+  padding: 0.35rem 0;
+}
+@media (min-width: 992px) {
+  .architecture-arrow {
+    padding: 0 0.5rem;
+  }
+}
+.architecture-arrow-connector {
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+}
+.architecture-arrow-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 6px 1px rgba(30, 215, 96, 0.7);
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: architecture-flow-v 2.2s ease-in-out infinite;
+}
+@media (min-width: 992px) {
+  /* Only the in-row connectors switch to horizontal — the row-to-row
+     connector (.architecture-arrow-connector) is always a down-arrow,
+     at every breakpoint, so its dot keeps traveling vertically. */
+  .architecture-row .architecture-arrow-dot {
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    animation-name: architecture-flow-h;
+  }
+}
+@keyframes architecture-flow-v {
+  0% {
+    top: 8%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 88%;
+    opacity: 0;
+  }
+}
+@keyframes architecture-flow-h {
+  0% {
+    left: 8%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 88%;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .architecture-step .app-card-icon::after {
+    animation: none;
+    box-shadow: none;
+  }
+  .architecture-arrow-dot {
+    display: none;
+  }
+}
+
+/* --- Badges ---------------------------------------------------------------- */
+.layer-badge {
+  display: inline-block;
+  background: var(--chip-bg);
+  color: var(--color-ink);
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* --- RAG pipeline steps (Architecture page, "Inside the Chatbot") ---------- */
+.pipeline-step-card {
+  position: relative;
+  padding-top: 2.25rem;
+}
+.pipeline-step-number {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--chip-bg);
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* --- Stat strip (Architecture page, "Gold, in Numbers") --------------------
+   Large numerals in the site's single restricted accent, small caption
+   below — deliberately not another .app-card so it reads as data, not
+   another content card in the scroll. */
+.stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xl);
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 7rem;
+}
+.stat-value {
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.1;
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* --- Tech stack badges (Architecture page) ---------------------------------
+   Reuses .layer-badge's pill treatment with an icon, laid out as a wrapping
+   row instead of one-per-card. */
+.tech-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--color-ink);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}
+.tech-badge i {
+  color: var(--color-primary);
+}
+
+/* --- RAG "at a glance" flow diagram (Architecture page) --------------------
+   A branching variant of .architecture-step/.architecture-arrow: one source
+   node, then stages of 2-3 nodes side by side, connected by vertical
+   connectors. Reuses the same pulse-ring (.app-card-icon::after via
+   .architecture-step) and traveling-dot (.architecture-arrow-dot)
+   animations already defined above — no new keyframes needed. */
+.rag-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.rag-flow-node {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 16rem;
+}
+.rag-flow-node .app-card {
+  padding: var(--space-md) var(--space-lg);
+}
+.rag-flow-source {
+  max-width: 14rem;
+}
+.rag-flow-node-accent .app-card {
+  --card-border-gradient: linear-gradient(135deg, rgba(30, 215, 96, 0.65), rgba(255, 255, 255, 0.07) 55%);
+}
+.rag-flow-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .rag-flow-stage {
+    flex-direction: row;
+  }
+}
+.rag-flow-stage-3 {
+  max-width: 52rem;
+}
+.rag-flow-stage-2 {
+  max-width: 36rem;
+}
+.rag-flow-connector {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  font-size: 1.35rem;
+  padding: 0.75rem 0;
+}
+.rag-flow-connector .architecture-arrow-dot {
+  animation: architecture-flow-v 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rag-flow-connector .architecture-arrow-dot {
+    display: none;
+  }
+}
+
+/* --- Deployment flow (Architecture page) ------------------------------------
+   Same linear-row treatment as the medallion flow's rows — reuses
+   .architecture-step/.architecture-arrow directly via the shared card
+   partial, each stage now carries its own explanatory text. */
+
+/* --- Progress markers (Architecture page) -----------------------------------
+   Three small 0% / 50% / 100% pills tying the page together as one
+   continuous story, matching the framing used in the live presentation. */
+.progress-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.4rem 1rem 0.4rem 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.progress-marker-percent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+}
+.progress-marker-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* --- Grain mini-explainer (Architecture page) -------------------------------
+   Two small example cards showing what "one row" means for a couple of
+   Gold tables — reuses .app-card, just narrower and side by side. */
+.grain-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+.grain-example-row .app-card {
+  flex: 1 1 16rem;
+  max-width: 20rem;
+}
+.grain-example-row .app-card-title {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.95rem;
+}
+
+/* --- Icon chip (shared circular icon treatment) ----------------------------
+   Used for social/contact icon links on Team, Contact, and the footer so
+   the same small interactive-icon pattern isn't redefined per page. */
+.icon-chip {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--chip-bg);
+  color: var(--color-muted);
+  font-size: 1rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.icon-chip:hover {
+  background: rgba(30, 215, 96, 0.14);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+/* --- Team cards -------------------------------------------------------------
+   Same gradient-ring treatment as the card border, applied to the avatar
+   circle so it reads as a deliberate frame rather than a flat chip. */
+.team-avatar {
+  --card-border-gradient: linear-gradient(135deg, rgba(30, 215, 96, 0.5), rgba(255, 255, 255, 0.08) 60%);
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: linear-gradient(var(--color-card), var(--color-card)) padding-box, var(--card-border-gradient) border-box;
+  border: 2px solid transparent;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  transition: transform 0.25s ease;
+}
+.team-card:hover .team-avatar {
+  transform: scale(1.06);
+}
+.team-role {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+.team-links {
+  gap: 0.5rem;
+}
+
+/* --- Forms ------------------------------------------------------------------
+   Bootstrap's form controls (and the form-select chevron, which is a dark
+   SVG baked into the default theme) assume a light page and render as a
+   near-invisible dark-on-dark or a jarring white box otherwise. Overridden
+   globally so every form on the site (chatbot input, contact form) is
+   consistent without per-page duplication. */
+.form-control,
+.form-select {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-ink);
+}
+.form-control::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--color-card);
+  border-color: var(--color-primary);
+  color: var(--color-ink);
+  box-shadow: 0 0 0 0.2rem rgba(30, 215, 96, 0.15);
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+.form-select option {
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+.form-label {
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* --- Documentation code snippets --------------------------------------------
+   A small "terminal window" treatment (classic macOS-style traffic-light
+   dots — a fixed, universally recognized dev-tool convention, not a brand
+   color statement) so illustrative snippets read as a real editor/terminal
+   rather than a plain gray box. Snippet text stays neutral slate/white. */
+.doc-code-block-wrap {
+  margin-top: var(--space-md);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.doc-code-block-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.doc-code-block-dots {
+  display: flex;
+  gap: 0.35rem;
+}
+.doc-code-block-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+.doc-code-block-dot:nth-child(1) {
+  background: #ff5f57;
+}
+.doc-code-block-dot:nth-child(2) {
+  background: #febc2e;
+}
+.doc-code-block-dot:nth-child(3) {
+  background: #28c840;
+}
+.doc-code-block-lang {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.doc-code-block {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--color-body);
+  overflow-x: auto;
+}
+
+/* --- Contact page ------------------------------------------------------------
+   form-floating labels default to a muted color that stays legible at
+   rest, and shift to the accent only while the field is focused or
+   filled — an interactive-state use of green, not a static one. */
+.form-floating > label {
+  color: var(--color-muted);
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  color: var(--color-primary);
+}
+
+.contact-info-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  color: var(--color-body);
+}
+.contact-info-list a {
+  color: var(--color-body);
+}
+.contact-info-list a:hover {
+  color: var(--color-primary);
+}
+
+/* --- Floating chat widget --------------------------------------------------
+   Reuses .icon-chip's circular treatment (scaled up, primary-filled since
+   this is a CTA not a passive link) for the toggle, and .app-card's
+   gradient-border shell for the panel — same visual language as the rest
+   of the site, just repositioned as a fixed overlay. */
+.chat-widget {
+  position: fixed;
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: 1040;
+}
+.chat-widget-toggle {
+  width: 3.25rem;
+  height: 3.25rem;
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+  font-size: 1.35rem;
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+  border: none;
+}
+.chat-widget-toggle:hover {
+  background: var(--color-primary-dark);
+  color: var(--color-primary-text-on);
+  transform: translateY(-2px);
+}
+.chat-widget-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-sm));
+  width: 20rem;
+  max-width: calc(100vw - 2 * var(--space-lg));
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 28rem;
+}
+.chat-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.chat-widget-close {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.chat-widget-close:hover {
+  color: var(--color-primary);
+}
+.chat-widget-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.chat-widget-message {
+  max-width: 85%;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  background: var(--color-card);
+  color: var(--color-body);
+}
+.chat-widget-message-user {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+}
+.chat-widget-sources {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+.chat-widget-input {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+.chat-widget-input input {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.75rem;
+  color: var(--color-ink);
+  font-size: 0.85rem;
+}
+.chat-widget-input input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-widget-toggle,
+  .chat-widget-toggle:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* --- RAG pipeline walkthrough page (core:rag_pipeline_walkthrough) ---------
+   Deliberately larger type than the rest of the site — this page is read
+   from out loud, standing at a laptop, presenting, not scanned on a
+   screen. Same neutral card/number treatment as .pipeline-step-card,
+   scaled up. */
+.walkthrough-narrative {
+  max-width: 46rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.walkthrough-beat {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+.walkthrough-beat-number {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--chip-bg);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.walkthrough-beat-title {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+.walkthrough-beat-text {
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: var(--color-body);
+  margin-bottom: 0;
+}
+.walkthrough-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border) 20%, var(--color-border) 80%, transparent);
+  margin: 0;
+}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% url 'chatbot:index' as chatbot_url %}
+{% url 'core:architecture' as architecture_url %}
+{% url 'documentation:index' as docs_url %}
+{% url 'core:about' as about_url %}
+
+<section class="page-section page-hero hero-full-bleed position-relative overflow-hidden text-center">
+  <div class="hero-waveform" aria-hidden="true">
+    <div class="hero-waveform-track">
+      <svg class="hero-waveform-svg" viewBox="0 0 800 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,60 C 33,15 67,105 100,60 C 133,15 167,105 200,60 C 233,15 267,105 300,60 C 333,15 367,105 400,60 C 433,15 467,105 500,60 C 533,15 567,105 600,60 C 633,15 667,105 700,60 C 733,15 767,105 800,60" fill="none" stroke="#1ED760" stroke-width="2"/>
+      </svg>
+      <svg class="hero-waveform-svg" viewBox="0 0 800 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0,60 C 33,15 67,105 100,60 C 133,15 167,105 200,60 C 233,15 267,105 300,60 C 333,15 367,105 400,60 C 433,15 467,105 500,60 C 533,15 567,105 600,60 C 633,15 667,105 700,60 C 733,15 767,105 800,60" fill="none" stroke="#1ED760" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container position-relative" style="z-index: 1;">
+    <span class="section-eyebrow reveal">CDAC Big Data Engineering Project</span>
+    <h1 class="display-5 fw-bold mb-3 reveal" style="letter-spacing: -0.02em;">Turning Spotify Streams into Real-Time Insight</h1>
+    <p class="section-subtitle mx-auto mb-4 reveal" style="font-size: 1.1rem;">
+      An end-to-end big data pipeline built on Spotify streaming data — from raw ingestion through
+      Bronze, Silver, and Gold layers — feeding a retrieval-augmented chatbot you can actually talk to.
+    </p>
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 reveal reveal-delay-1">
+      {% include 'partials/button.html' with href=chatbot_url label="Try the Chatbot" icon="bi-arrow-right" %}
+      {% include 'partials/button.html' with href=architecture_url label="Explore Architecture" variant="outline-primary" %}
+    </div>
+
+    <div class="row g-3 justify-content-center mt-5 reveal reveal-delay-2">
+      <div class="col-6 col-md-3">
+        <div class="hero-stat-card">
+          <div class="hero-stat-value">1.9T+</div>
+          <div class="hero-stat-label">Streams Tracked</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="hero-stat-card">
+          <div class="hero-stat-value">72</div>
+          <div class="hero-stat-label">Countries Covered</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="hero-stat-card">
+          <div class="hero-stat-value">2017–2026</div>
+          <div class="hero-stat-label">Data Range</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Platform" title="What's Inside" subtitle="Everything needed to go from raw streaming data to decisions, in one place." %}
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        {% include 'partials/card.html' with icon="bi-diagram-3" title="Data Pipeline" text="Ingestion through Bronze, Silver, and Gold layers on S3." %}
+      </div>
+      <div class="col-md-6 col-lg-4">
+        {% include 'partials/card.html' with icon="bi-chat-dots" title="RAG Chatbot" text="Ask questions and get answers grounded in the pipeline's data." %}
+      </div>
+      <div class="col-md-6 col-lg-4">
+        {% include 'partials/card.html' with icon="bi-journal-text" title="Documentation" text="Guides and references covering every layer of the platform." %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section text-center">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Get Involved" title="Explore the Project" subtitle="Read the full story behind the pipeline, or browse the documentation." %}
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+      {% include 'partials/button.html' with href=docs_url label="Browse Documentation" variant="outline-primary" %}
+      {% include 'partials/button.html' with href=about_url label="About the Project" %}
+    </div>
+  </div>
+</section>
+{% endblock %}

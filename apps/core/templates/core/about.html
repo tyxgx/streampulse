@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}About Project{% endblock %}
+
+{% block content %}
+{% url 'team:index' as team_url %}
+
+<section class="page-section page-hero">
+  <div class="container">
+    {% include 'partials/section_header.html' with eyebrow="About" title="About the Project" align="text-start" %}
+    <p class="section-subtitle" style="max-width: 48rem;">
+      This project was built by a group of CDAC Big Data Engineering students to demonstrate how raw
+      Spotify streaming data can be ingested, transformed through a Bronze/Silver/Gold medallion
+      pipeline on AWS S3, and served through a conversational,
+      retrieval-augmented chatbot. The full stack — Postgres with pgvector for retrieval, Redis for
+      caching, and a multi-provider LLM fallback chain — runs live on AWS EC2, grounded end-to-end
+      in real Gold-layer data.
+    </p>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container">
+    {% include 'partials/section_header.html' with title="Objectives" align="text-start" %}
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        {% include 'partials/card.html' with icon="bi-bullseye" title="Reliable Ingestion" text="Capture raw data from multiple sources without loss or duplication." %}
+      </div>
+      <div class="col-md-6 col-lg-3">
+        {% include 'partials/card.html' with icon="bi-shield-check" title="Data Quality" text="Progressive cleaning and validation across Bronze, Silver, and Gold layers." %}
+      </div>
+      <div class="col-md-6 col-lg-3">
+        {% include 'partials/card.html' with icon="bi-speedometer2" title="Actionable Insight" text="Turn business-ready Gold-layer metrics into direct, conversational answers." %}
+      </div>
+      <div class="col-md-6 col-lg-3">
+        {% include 'partials/card.html' with icon="bi-chat-square-text" title="Conversational Access" text="Let users ask natural-language questions of the underlying data." %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section text-center">
+  <div class="container">
+    <p class="section-subtitle mx-auto mb-4">Curious who built this?</p>
+    {% include 'partials/button.html' with href=team_url label="Meet the Team" icon="bi-arrow-right" %}
+  </div>
+</section>
+{% endblock %}

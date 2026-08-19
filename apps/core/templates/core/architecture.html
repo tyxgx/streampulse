@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Architecture & Pipeline{% endblock %}
+
+{% block content %}
+{% url 'chatbot:index' as chatbot_url %}
+
+<section class="page-section page-hero">
+  <div class="container reveal">
+    <div class="text-center">
+      <span class="progress-marker"><span class="progress-marker-percent">{{ progress.start.percent }}</span><span class="progress-marker-label">{{ progress.start.label }}</span></span>
+    </div>
+    {% include 'partials/section_header.html' with eyebrow="System Design" title="Architecture & Pipeline" subtitle="From raw streaming data to a trustworthy Gold layer, to a chatbot you can actually talk to — every stage, end to end." %}
+  </div>
+</section>
+
+<!-- ============ HALF 1 — DATA FOUNDATION ============ -->
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Data Foundation" title="Raw Data → Trustworthy Data" subtitle="Data flows through a series of well-defined stages, from raw ingestion to the interfaces analysts and stakeholders actually use." align="text-start" %}
+    <div class="architecture-flow">
+      <div class="architecture-row d-flex flex-column flex-lg-row align-items-stretch">
+        {% for stage in flow|slice:":4" %}
+          <div class="architecture-step" style="--stage-index: {{ forloop.counter0 }};">
+            {% include 'partials/card.html' with icon=stage.icon title=stage.title text=stage.text %}
+          </div>
+          {% if not forloop.last %}
+            <div class="architecture-arrow">
+              <span class="architecture-arrow-dot" aria-hidden="true"></span>
+              <i class="bi bi-arrow-right d-none d-lg-block"></i>
+              <i class="bi bi-arrow-down d-lg-none"></i>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="architecture-arrow architecture-arrow-connector">
+        <span class="architecture-arrow-dot" aria-hidden="true"></span>
+        <i class="bi bi-arrow-down"></i>
+      </div>
+
+      <div class="architecture-row d-flex flex-column flex-lg-row align-items-stretch justify-content-center">
+        {% for stage in flow|slice:"4:" %}
+          <div class="architecture-step" style="--stage-index: {{ forloop.counter0|add:4 }};">
+            {% include 'partials/card.html' with icon=stage.icon title=stage.title text=stage.text %}
+          </div>
+          {% if not forloop.last %}
+            <div class="architecture-arrow">
+              <span class="architecture-arrow-dot" aria-hidden="true"></span>
+              <i class="bi bi-arrow-right d-none d-lg-block"></i>
+              <i class="bi bi-arrow-down d-lg-none"></i>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Storage Model" title="Bronze, Silver, Gold" subtitle="A medallion architecture keeps every stage of transformation auditable and re-runnable." %}
+    <div class="row g-4">
+      {% for layer in layers %}
+        <div class="col-md-4">
+          <div class="app-card h-100">
+            <span class="badge layer-badge mb-3">{{ layer.badge }}</span>
+            <h5 class="app-card-title">{{ layer.title }}</h5>
+            <p class="app-card-text">{{ layer.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Scale" title="Gold, in Numbers" %}
+    <div class="stat-strip">
+      {% for stat in gold_stats %}
+        <div class="stat-item">
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Inside Gold" title="Seven Purpose-Built Tables" subtitle="Each aggregated at its own grain — one row means one specific thing per table." %}
+    <div class="row g-4">
+      {% for table in gold_tables %}
+        <div class="col-6 col-md-4 col-lg">
+          {% include 'partials/card.html' with icon=table.icon title=table.title text=table.text %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    <p class="section-subtitle mx-auto text-center mb-4" style="max-width: 42rem;">{{ grain.intro }}</p>
+    <div class="grain-example-row">
+      {% for example in grain.examples %}
+        {% include 'partials/card.html' with icon="bi-table" title=example.title text=example.text %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ============ HALF 2 — RAG ENGINE & DEPLOYMENT ============ -->
+<section class="page-section">
+  <div class="container reveal">
+    <div class="text-center">
+      <span class="progress-marker"><span class="progress-marker-percent">{{ progress.mid.percent }}</span><span class="progress-marker-label">{{ progress.mid.label }}</span></span>
+    </div>
+    {% include 'partials/section_header.html' with eyebrow="Act Two" title="RAG Engine & Deployment" subtitle="How a question actually gets answered — deterministic where possible, grounded and gated everywhere else — and how it all runs live." %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="The Idea" title="What is RAG?" subtitle=rag_concept.intro %}
+    <div class="architecture-row d-flex flex-column flex-lg-row align-items-stretch">
+      {% for node in rag_concept.nodes %}
+        <div class="architecture-step" style="--stage-index: {{ forloop.counter0 }};">
+          {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+        </div>
+        {% if not forloop.last %}
+          <div class="architecture-arrow">
+            <span class="architecture-arrow-dot" aria-hidden="true"></span>
+            <i class="bi bi-arrow-right d-none d-lg-block"></i>
+            <i class="bi bi-arrow-down d-lg-none"></i>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <p class="section-subtitle text-center mt-4 mb-0 fst-italic">"{{ rag_concept.tagline }}"</p>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="At a Glance" title="The RAG Architecture" subtitle="Every Gold row becomes searchable ahead of time. Every question takes the right path." %}
+    <div class="rag-flow">
+      <div class="rag-flow-node rag-flow-source">
+        {% include 'partials/card.html' with icon=rag_flow_overview.source.icon title=rag_flow_overview.source.title text=rag_flow_overview.source.text %}
+      </div>
+      <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+      <div class="rag-flow-stage rag-flow-stage-3">
+        {% for node in rag_flow_overview.prep %}
+          <div class="rag-flow-node" style="--stage-index: {{ forloop.counter0 }};">
+            {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+      <div class="rag-flow-stage rag-flow-stage-2">
+        {% for node in rag_flow_overview.route %}
+          <div class="rag-flow-node rag-flow-node-accent" style="--stage-index: {{ forloop.counter0 }};">
+            {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+      <div class="rag-flow-stage rag-flow-stage-2">
+        {% for node in rag_flow_overview.output %}
+          <div class="rag-flow-node" style="--stage-index: {{ forloop.counter0 }};">
+            {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Opening the Boxes" title="Inside the Chatbot" subtitle="The same architecture above, one box at a time." %}
+    <div class="row g-4">
+      {% for step in rag_pipeline %}
+        <div class="col-md-6 col-lg-4">
+          <div class="app-card h-100 pipeline-step-card">
+            <span class="pipeline-step-number">{{ step.step }}</span>
+            <h5 class="app-card-title">{{ step.title }}</h5>
+            <p class="app-card-text">{{ step.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Built With" title="Tech Stack" %}
+    <div class="tech-badge-row">
+      {% for tech in tech_stack %}
+        <span class="tech-badge"><i class="bi {{ tech.icon }}"></i>{{ tech.label }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Deployment" title="Live on AWS" subtitle="Not a demo — a real request path serving real users." %}
+    <div class="architecture-row d-flex flex-column flex-lg-row align-items-stretch deployment-flow">
+      {% for stage in deployment_flow %}
+        <div class="architecture-step" style="--stage-index: {{ forloop.counter0 }};">
+          {% include 'partials/card.html' with icon=stage.icon title=stage.title text=stage.text %}
+        </div>
+        {% if not forloop.last %}
+          <div class="architecture-arrow">
+            <span class="architecture-arrow-dot" aria-hidden="true"></span>
+            <i class="bi bi-arrow-right d-none d-lg-block"></i>
+            <i class="bi bi-arrow-down d-lg-none"></i>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section text-center">
+  <div class="container reveal">
+    <span class="progress-marker"><span class="progress-marker-percent">{{ progress.end.percent }}</span><span class="progress-marker-label">{{ progress.end.label }}</span></span>
+    <p class="section-subtitle mx-auto mb-4">See it for yourself.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      {% include 'partials/button.html' with href=chatbot_url label="Try the Chatbot" icon="bi-chat-dots" %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% comment %}
+The RAG pipeline diagram + 7-beat spoken narrative, rendered as one block.
+Included twice by rag_pipeline_walkthrough.html — same content both times,
+by design (see RagPipelineWalkthroughView's docstring) — with `eyebrow`
+passed in so each copy gets its own neutral, unnamed heading.
+Usage: {% include 'core/partials/rag_walkthrough_block.html' with eyebrow="Walkthrough — Part A" %}
+{% endcomment %}
+<div class="container">
+  {% include 'partials/section_header.html' with eyebrow=eyebrow title="The RAG Pipeline" subtitle="From a stakeholder's question to a grounded, trustworthy answer." align="text-start" %}
+
+  <div class="rag-flow mb-5">
+    <div class="rag-flow-node rag-flow-source">
+      {% include 'partials/card.html' with icon=rag_flow_overview.source.icon title=rag_flow_overview.source.title text=rag_flow_overview.source.text %}
+    </div>
+    <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+    <div class="rag-flow-stage rag-flow-stage-3">
+      {% for node in rag_flow_overview.prep %}
+        <div class="rag-flow-node" style="--stage-index: {{ forloop.counter0 }};">
+          {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+    <div class="rag-flow-stage rag-flow-stage-2">
+      {% for node in rag_flow_overview.route %}
+        <div class="rag-flow-node rag-flow-node-accent" style="--stage-index: {{ forloop.counter0 }};">
+          {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="rag-flow-connector"><span class="architecture-arrow-dot" aria-hidden="true"></span><i class="bi bi-arrow-down"></i></div>
+
+    <div class="rag-flow-stage rag-flow-stage-2">
+      {% for node in rag_flow_overview.output %}
+        <div class="rag-flow-node" style="--stage-index: {{ forloop.counter0 }};">
+          {% include 'partials/card.html' with icon=node.icon title=node.title text=node.text %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="walkthrough-narrative">
+    {% for beat in narrative %}
+      <div class="walkthrough-beat">
+        <span class="walkthrough-beat-number">{{ forloop.counter }}</span>
+        <div>
+          <h3 class="walkthrough-beat-title">{{ beat.title }}</h3>
+          <p class="walkthrough-beat-text">{{ beat.text }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>

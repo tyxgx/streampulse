@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<section class="page-section page-hero">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Get in Touch" title="Contact Us" subtitle="Questions about the project, the pipeline, or want to collaborate? Send a message below." %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    <div class="row g-5">
+      <div class="col-lg-7">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="contactName" name="name" placeholder="Name" required>
+                <label for="contactName">Name</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="contactEmail" name="email" placeholder="Email" required>
+                <label for="contactEmail">Email</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="contactSubject" name="subject" placeholder="Subject" required>
+                <label for="contactSubject">Subject</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-floating">
+                <textarea class="form-control" id="contactMessage" name="message" placeholder="Message" style="height: 140px" required></textarea>
+                <label for="contactMessage">Message</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary px-4 py-2">Send Message</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="app-card h-100">
+          <h5 class="app-card-title mb-3">Other Ways to Reach Us</h5>
+          <ul class="list-unstyled contact-info-list">
+            <li><span class="icon-chip"><i class="bi bi-envelope"></i></span> <span>team@example.com</span></li>
+            <li><span class="icon-chip"><i class="bi bi-github"></i></span> <a href="#">Project Repository</a></li>
+            <li><span class="icon-chip"><i class="bi bi-geo-alt"></i></span> <span>CDAC, India</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

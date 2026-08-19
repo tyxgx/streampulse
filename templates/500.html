@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Something Went Wrong{% endblock %}
+
+{% block content %}
+<section class="page-section page-hero text-center">
+  <div class="container">
+    <span class="section-eyebrow">Error 500</span>
+    <h1 class="section-title" style="font-size: clamp(2rem, 4vw, 3rem);">Something Went Wrong</h1>
+    <p class="section-subtitle mx-auto mb-4">An unexpected error occurred on our end. Please try again shortly.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Back to Home</a>
+  </div>
+</section>
+{% endblock %}

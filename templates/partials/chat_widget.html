@@ -1,0 +1,22 @@
+{% load static %}
+{% comment %}
+Floating RAG chat widget. Matches the dark theme's .app-card / .icon-chip /
+--color-primary tokens already defined in static/css/main.css.
+{% endcomment %}
+<div class="chat-widget" id="chatWidget">
+  <button class="chat-widget-toggle icon-chip" id="chatWidgetToggle" aria-label="Open chat" aria-expanded="false">
+    <i class="bi bi-chat-dots"></i>
+  </button>
+  <div class="chat-widget-panel app-card" id="chatWidgetPanel" hidden>
+    <div class="chat-widget-header">
+      <span>Ask about the data</span>
+      <button class="chat-widget-close" id="chatWidgetClose" aria-label="Close chat">&times;</button>
+    </div>
+    <div class="chat-widget-messages" id="chatWidgetMessages"></div>
+    <form class="chat-widget-input" id="chatWidgetForm">
+      <input type="text" id="chatWidgetInput" placeholder="Ask a question..." autocomplete="off">
+      <button type="submit" class="btn btn-primary btn-sm">Send</button>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/chat-widget.js' %}"></script>

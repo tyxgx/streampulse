@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+staticfiles/
+media/
+logs/*.log
+.DS_Store
+*.egg-info/
+.gold_local/
+.gold_local_new/
+.gold_artist_output/
+.silver_local/
+*.zip

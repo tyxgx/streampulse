@@ -1,0 +1,53 @@
+{% comment %}
+Fixed top navbar shared by every page — transparent until main.js adds
+.navbar-scrolled on scroll (see static/js/main.js). Active-link state is
+derived from request.resolver_match (namespace + url_name) rather than
+hardcoded per page, so new pages get correct highlighting automatically.
+{% endcomment %}
+<nav class="navbar navbar-expand-lg site-navbar">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'core:home' %}">
+      <i class="bi bi-diagram-3"></i>
+      <span>Stream<span class="text-primary">Pulse</span></span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.namespace == 'core' and request.resolver_match.url_name == 'home' %}active{% endif %}"
+             href="{% url 'core:home' %}">Home</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'core' and request.resolver_match.url_name != 'home' %}active{% endif %}"
+             href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Project</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'core:about' %}">About Project</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:architecture' %}">Architecture &amp; Pipeline</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.namespace == 'chatbot' %}active{% endif %}"
+             href="{% url 'chatbot:index' %}">Chatbot</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.namespace == 'documentation' %}active{% endif %}"
+             href="{% url 'documentation:index' %}">Docs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.namespace == 'team' %}active{% endif %}"
+             href="{% url 'team:index' %}">Team</a>
+        </li>
+        <li class="nav-item ms-lg-3">
+          <a class="btn btn-primary btn-sm px-3" href="{% url 'contact:index' %}">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Team{% endblock %}
+
+{% block content %}
+<section class="page-section page-hero">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Who We Are" title="Team" subtitle="The CDAC Big Data Engineering group behind this project." %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    <div class="row g-4">
+      {% for member in members %}
+        <div class="col-sm-6 col-lg-4">
+          <div class="app-card h-100 text-center team-card">
+            <div class="team-avatar mx-auto mb-3">{{ member.initials }}</div>
+            <h5 class="app-card-title mb-1">{{ member.name }}</h5>
+            <p class="team-role mb-3">{{ member.role }}</p>
+            <div class="d-flex justify-content-center team-links">
+              <a href="{{ member.github }}" class="icon-chip" aria-label="{{ member.name }} on GitHub"><i class="bi bi-github"></i></a>
+              <a href="{{ member.linkedin }}" class="icon-chip" aria-label="{{ member.name }} on LinkedIn"><i class="bi bi-linkedin"></i></a>
+              <a href="mailto:{{ member.email }}" class="icon-chip" aria-label="Email {{ member.name }}"><i class="bi bi-envelope"></i></a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

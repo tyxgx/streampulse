@@ -1,0 +1,45 @@
+[
+  {
+    "label": "normal_factual",
+    "question": "How did Kendrick Lamar perform in 2024?",
+    "response": {
+      "reply": "**Kendrick Lamar** had **5,986,470,192** total streams in 2024, with key metrics including:\n* Average catalog hit rate: **36.92%**\n* Average chart strength: **49.39%**\n* Total active songs: up to **30**\n* Countries reached: up to **62**",
+      "sources": [
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024"
+      ]
+    }
+  },
+  {
+    "label": "comparison",
+    "question": "Compare India and Brazil's streaming performance.",
+    "response": {
+      "reply": "### Comparison of India and Brazil's Streaming Performance\nThe context provides data on **India** and **Brazil**'s streaming performance on Spotify across various years. \n* In **2022**, **India** recorded **11,229,209,910** total streams with an average market share of **3.62%**, while **Brazil** recorded **16,778,906,043** total streams with an average market share of **5.54%**.\n* In **2026**, **India** recorded **9,025,578,323** total streams with an average market share of **5.38%**, while **Brazil** recorded **8,681,378,681** total streams with an average market share of **5.18%**.\n\n| Country | Year | Total Streams | Average Market Share |\n| --- | --- | --- | --- |\n| **India** | 2022 | 11,229,209,910 | 3.62% |\n| **Brazil** | 2022 | 16,778,906,043 | 5.54% |\n| **India** | 2026 | 9,025,578,323 | 5.38% |\n| **Brazil** | 2026 | 8,681,378,681 | 5.18% |",
+      "sources": [
+        "country_performance:Brazil|2025",
+        "country_performance:Brazil|2022",
+        "country_performance:Brazil|2023",
+        "country_performance:Brazil|2026",
+        "country_performance:Brazil|2018",
+        "country_performance:India|2022",
+        "country_performance:India|2026",
+        "country_performance:India|2019",
+        "country_performance:India|2020",
+        "country_performance:India|2023"
+      ]
+    }
+  },
+  {
+    "label": "count_sql_router",
+    "question": "How many countries are covered in the data?",
+    "response": {
+      "reply": "There are **73** distinct countries in the data.",
+      "sources": [
+        "sql:country_performance:COUNT(DISTINCT country_name)"
+      ]
+    }
+  }
+]

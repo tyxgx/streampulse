@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Documentation{% endblock %}
+
+{% block content %}
+<section class="page-section page-hero">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Reference" title="Documentation" subtitle="Guides and references covering setup, architecture, the Gold schema, the chatbot's RAG pipeline, and the live API." %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    <div class="row g-4">
+      {% for doc in docs %}
+        <div class="col-md-6 col-lg-4">
+          <div class="app-card h-100">
+            <span class="badge layer-badge mb-3">{{ doc.category }}</span>
+            <div class="app-card-icon"><i class="bi {{ doc.icon }}"></i></div>
+            <h5 class="app-card-title">{{ doc.title }}</h5>
+            <p class="app-card-text">{{ doc.text }}</p>
+            {% if doc.code %}
+              <div class="doc-code-block-wrap">
+                <div class="doc-code-block-chrome">
+                  <div class="doc-code-block-dots">
+                    <span class="doc-code-block-dot"></span>
+                    <span class="doc-code-block-dot"></span>
+                    <span class="doc-code-block-dot"></span>
+                  </div>
+                  <span class="doc-code-block-lang">{{ doc.code.language }}</span>
+                </div>
+                <pre class="doc-code-block"><code>{{ doc.code.snippet }}</code></pre>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

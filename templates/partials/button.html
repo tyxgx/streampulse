@@ -1,0 +1,9 @@
+{% comment %}
+Reusable call-to-action button/link. Usage:
+  {% include 'partials/button.html' with href=some_url label="Get Started" variant="primary" icon="bi-arrow-right" %}
+`variant` maps directly to a Bootstrap btn-* modifier (default: "primary").
+{% endcomment %}
+<a href="{{ href }}" class="btn btn-{{ variant|default:'primary' }} {{ extra_class }}">
+  {{ label }}
+  {% if icon %}<i class="bi {{ icon }} ms-1"></i>{% endif %}
+</a>

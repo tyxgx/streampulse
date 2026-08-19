@@ -1,0 +1,45 @@
+[
+  {
+    "label": "normal_factual",
+    "question": "How did Kendrick Lamar perform in 2024?",
+    "response": {
+      "reply": "In 2024, Kendrick Lamar had 5,986,470,192 total streams across up to 30 active songs, reaching up to 62 countries. His average catalog hit rate was 36.92%, and his average chart strength was 49.39.",
+      "sources": [
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+        "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024"
+      ]
+    }
+  },
+  {
+    "label": "comparison",
+    "question": "Compare India and Brazil's streaming performance.",
+    "response": {
+      "reply": "Comparing India and Brazil's streaming performance on Spotify, we can see some differences. \n\nIn terms of total streams, Brazil had more streams than India in the years provided, with the highest being 22,777,358,198 in 2023 for Brazil, and 18,788,626,501 in 2023 for India.\n\nThe average market share for Brazil ranged from 4.45% in 2018 to 5.76% in 2023, while for India it ranged from 0.60% in 2019 to 5.38% in 2026.\n\nThe average growth rate also varied, with Brazil's growth rate ranging from -10.94% in 2026 to 2.20% in 2023, and India's growth rate ranging from -9.64% in 2026 to 186.08% in 2019.\n\nThe number of active songs, artists, and labels also differed between the two countries. Brazil had up to 414 active songs, 430 active artists, and 153 active labels in 2025, while India had up to 336 active songs, 402 active artists, and 117 active labels in 2019.\n\nThe top artists and labels also differed, with Henrique & Juliano and Sony Music Entertainment being the most recent top artist and label in Brazil, and Banjaare and T-series being the most recent top artist and label in India in 2026. \n\nHowever, without more context or specific years to compare, it's difficult to make a direct comparison between the two countries' streaming performance.",
+      "sources": [
+        "country_performance:Brazil|2025",
+        "country_performance:Brazil|2022",
+        "country_performance:Brazil|2023",
+        "country_performance:Brazil|2026",
+        "country_performance:Brazil|2018",
+        "country_performance:India|2022",
+        "country_performance:India|2026",
+        "country_performance:India|2019",
+        "country_performance:India|2020",
+        "country_performance:India|2023"
+      ]
+    }
+  },
+  {
+    "label": "count_sql_router",
+    "question": "How many countries are covered in the data?",
+    "response": {
+      "reply": "There are 73 distinct countries in the data.",
+      "sources": [
+        "sql:country_performance:COUNT(DISTINCT country_name)"
+      ]
+    }
+  }
+]

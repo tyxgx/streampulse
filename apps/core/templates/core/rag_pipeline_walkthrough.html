@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}RAG Pipeline Walkthrough{% endblock %}
+
+{% block content %}
+<section class="page-section page-hero">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Presentation Mode" title="RAG Pipeline Walkthrough" subtitle="The same pipeline, in two identical copies below — open whichever one is yours and present from it directly." %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt reveal">
+  {% include 'core/partials/rag_walkthrough_block.html' with eyebrow="Walkthrough — Part A" %}
+</section>
+
+<div class="walkthrough-divider" aria-hidden="true"></div>
+
+<section class="page-section reveal">
+  {% include 'core/partials/rag_walkthrough_block.html' with eyebrow="Walkthrough — Part B" %}
+</section>
+{% endblock %}

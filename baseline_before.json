@@ -1,0 +1,947 @@
+[
+  {
+    "question": "How did Kendrick Lamar perform in 2024?",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+        "distance": 0.8958564171293562
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+        "distance": 0.8971869680415708
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+        "distance": 0.8976987704173962
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+        "distance": 0.9008462212481985
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024",
+        "distance": 0.9016849705700356
+      }
+    ],
+    "final_answer": "Kendrick Lamar performed well in 2024, with a total of 5,986,470,192 streams across up to 30 active song(s), reaching up to 62 countries that year. His average catalog hit rate was 36.92%, and his average chart strength was 49.39%.",
+    "sources": [
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024"
+    ],
+    "timing_s": {
+      "embed": 11.545,
+      "classify": 0.194,
+      "retrieve": 0.44,
+      "full_get_rag_reply": 9.426
+    },
+    "id": "single_entity_lookup"
+  },
+  {
+    "question": "How has Kendrick Lamar's streaming changed from 2020 to 2024?",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+        "distance": 0.8814508182244645
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+        "distance": 0.8885867570629081
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+        "distance": 0.8901078245126123
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024",
+        "distance": 0.8940371685579535
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+        "distance": 0.8942615152331591
+      }
+    ],
+    "final_answer": "Unfortunately, the provided context does not include data for 2020 or 2026-2024 comparison (only 2023 and 2024 are mentioned). Therefore, I cannot accurately answer how Kendrick Lamar's streaming changed from 2020 to 2024.",
+    "sources": [
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2025",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2022",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2024",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026"
+    ],
+    "timing_s": {
+      "embed": 0.395,
+      "classify": 0.0,
+      "retrieve": 0.844,
+      "full_get_rag_reply": 3.911
+    },
+    "id": "multi_year_trend"
+  },
+  {
+    "question": "Compare India and Brazil's streaming performance.",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2025"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2018"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2022"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2017"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Brazil|2025",
+        "distance": 1.0397470843454706
+      },
+      {
+        "source_key": "Brazil|2023",
+        "distance": 1.0451679831194254
+      },
+      {
+        "source_key": "Brazil|2018",
+        "distance": 1.0479711800281613
+      },
+      {
+        "source_key": "India|2022",
+        "distance": 1.0485901518208467
+      },
+      {
+        "source_key": "Brazil|2017",
+        "distance": 1.0509797089647834
+      }
+    ],
+    "final_answer": "Based on the provided context, here are some key differences in streaming performance between India and Brazil:\n\n1. Total Streams:\n   - Brazil (2025): 22,439,295,308\n   - India (2022): 11,229,209,910\n\n2. Market Share:\n   - Brazil (2025): 5.13%\n   - India (2022): 3.62%\n\n3. Growth Rate:\n   - Brazil (2025): 5.13% average growth\n   - India (2022): 6.33% average growth\n\n4. Number of Active Artists and Labels:\n   - Brazil (2025): 430 active artists, 153 active labels\n   - Brazil (2023): 410 active artists, 136 active labels\n   - India (2022): 364 active artists, 107 active labels\n\n5. Most Recent Top Artist:\n   - Brazil (2025): Henrique & Juliano\n   - Brazil (2017): Henrique & Juliano\n   - India (2022): Unknown Artist\n\n6. Most Recent Top Label:\n   - Brazil (2025), (2017), and (2023): Sony Music Entertainment\n   - India (2022): Sony Music Entertainment India Pvt. Ltd.\n\nNote: The data for 2025 is not directly comparable to the other years, as it represents a different time frame. However, it does show a similar overall trend in streaming growth between Brazil and India compared to previous years.",
+    "sources": [
+      "country_performance:Brazil|2025",
+      "country_performance:Brazil|2023",
+      "country_performance:Brazil|2018",
+      "country_performance:India|2022",
+      "country_performance:Brazil|2017"
+    ],
+    "timing_s": {
+      "embed": 0.074,
+      "classify": 0.0,
+      "retrieve": 0.009,
+      "full_get_rag_reply": 15.733
+    },
+    "id": "comparison_2_countries"
+  },
+  {
+    "question": "Compare Kendrick Lamar and Drake's streaming performance.",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2019"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2017"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2018"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2019",
+        "distance": 0.8641360439575375
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2017",
+        "distance": 0.8709972311013113
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+        "distance": 0.8735673279059463
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+        "distance": 0.8743235493724701
+      },
+      {
+        "source_key": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2018",
+        "distance": 0.8751149783204272
+      }
+    ],
+    "final_answer": "Unfortunately, the provided context does not contain information about Drake's streaming performance, so I cannot make a comparison between Kendrick Lamar and Drake. The data is only available for Kendrick Lamar from 2017 to 2023.",
+    "sources": [
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2019",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2017",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2026",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2023",
+      "artist_performance:spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg|2018"
+    ],
+    "timing_s": {
+      "embed": 0.241,
+      "classify": 0.0,
+      "retrieve": 0.344,
+      "full_get_rag_reply": 4.727
+    },
+    "id": "comparison_2_artists"
+  },
+  {
+    "question": "Which country had the strongest streaming numbers?",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "Paraguay|2020"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Hungary|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Uruguay|2024"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Kazakhstan|2025"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Bolivia|2026"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Paraguay|2020",
+        "distance": 0.9559775955555617
+      },
+      {
+        "source_key": "Hungary|2023",
+        "distance": 0.9603202822488149
+      },
+      {
+        "source_key": "Uruguay|2024",
+        "distance": 0.9622231853294055
+      },
+      {
+        "source_key": "Kazakhstan|2025",
+        "distance": 0.9628200543833737
+      },
+      {
+        "source_key": "Bolivia|2026",
+        "distance": 0.9629173352481155
+      }
+    ],
+    "final_answer": "The country with the strongest streaming numbers cannot be directly determined based on the provided information, as it is measured by total streams. However, we can analyze the data in a comparative manner to identify which countries have the most active artists and labels represented.\n\nIn this context, Hungary had the highest number of active artists (370) and active labels (185), followed closely by Bolivia with 239 and Kazakhstan (266). \n\nUruguay had 289 active artists and 143 active labels. Paraguay and Kazakhstan had fewer active labels compared to other countries but more active artists (253).\n\nThere is no direct information about the total number of streams for each country in comparison, however.\n\nTherefore, Hungary seems to have the most diverse music industry presence based on the available data.",
+    "sources": [
+      "country_performance:Paraguay|2020",
+      "country_performance:Hungary|2023",
+      "country_performance:Uruguay|2024",
+      "country_performance:Kazakhstan|2025",
+      "country_performance:Bolivia|2026"
+    ],
+    "timing_s": {
+      "embed": 0.088,
+      "classify": 0.0,
+      "retrieve": 0.009,
+      "full_get_rag_reply": 8.519
+    },
+    "id": "superlative_country"
+  },
+  {
+    "question": "Which artist grew the most in 2023?",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "label_performance",
+        "source_key": "Art Of Creation|2025"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Art Of Creation|2022"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2025"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2024"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2023"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Art Of Creation|2025",
+        "distance": 1.0276391362567188
+      },
+      {
+        "source_key": "Art Of Creation|2022",
+        "distance": 1.0408578148297387
+      },
+      {
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2025",
+        "distance": 1.050756915069487
+      },
+      {
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2024",
+        "distance": 1.0538779648703034
+      },
+      {
+        "source_key": "spotify:artist:1K7IC4qha4KEXySo6yZmnH|2023",
+        "distance": 1.0546778925705356
+      }
+    ],
+    "final_answer": "According to the provided context, I don't have enough information to determine which artist grew the most in 2023. The data only shows a comparison between Michelangelo and no other artists across different years. There's also missing information for Art Of Creation, making it difficult to provide an accurate answer without more context.",
+    "sources": [
+      "label_performance:Art Of Creation|2025",
+      "label_performance:Art Of Creation|2022",
+      "artist_performance:spotify:artist:1K7IC4qha4KEXySo6yZmnH|2025",
+      "artist_performance:spotify:artist:1K7IC4qha4KEXySo6yZmnH|2024",
+      "artist_performance:spotify:artist:1K7IC4qha4KEXySo6yZmnH|2023"
+    ],
+    "timing_s": {
+      "embed": 0.117,
+      "classify": 0.0,
+      "retrieve": 0.974,
+      "full_get_rag_reply": 5.446
+    },
+    "id": "superlative_artist_growth"
+  },
+  {
+    "question": "How many labels are there in total?",
+    "routed_table": "label_performance",
+    "top5_chunks": [
+      {
+        "source_table": "label_performance",
+        "source_key": "Labelle|2018"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Most Label|2023"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Most Label|2022"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Labelle|2017"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Label V|2021"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Labelle|2018",
+        "distance": 0.9160795860490337
+      },
+      {
+        "source_key": "Most Label|2023",
+        "distance": 0.9184066701869451
+      },
+      {
+        "source_key": "Most Label|2022",
+        "distance": 0.9230992544893336
+      },
+      {
+        "source_key": "Labelle|2017",
+        "distance": 0.9243350745007137
+      },
+      {
+        "source_key": "Label V|2021",
+        "distance": 0.9319531058641557
+      }
+    ],
+    "final_answer": "The context doesn't provide a clear answer to the number of labels, as it only shows data for specific labels (Labelle, Most Label) and a generic \"label\" with varying market share across multiple years. There's no explicit count or indication of the total number of labels.",
+    "sources": [
+      "label_performance:Labelle|2018",
+      "label_performance:Most Label|2023",
+      "label_performance:Most Label|2022",
+      "label_performance:Labelle|2017",
+      "label_performance:Label V|2021"
+    ],
+    "timing_s": {
+      "embed": 0.097,
+      "classify": 0.0,
+      "retrieve": 0.384,
+      "full_get_rag_reply": 4.46
+    },
+    "id": "count_labels"
+  },
+  {
+    "question": "How many countries are covered in the data?",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "Paraguay|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Saudi Arabia|2022"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Bolivia|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Ecuador|2024"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Bolivia|2024"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Paraguay|2023",
+        "distance": 1.1640037163350665
+      },
+      {
+        "source_key": "Saudi Arabia|2022",
+        "distance": 1.1658606242506961
+      },
+      {
+        "source_key": "Bolivia|2023",
+        "distance": 1.172179525862327
+      },
+      {
+        "source_key": "Ecuador|2024",
+        "distance": 1.1726469930325365
+      },
+      {
+        "source_key": "Bolivia|2024",
+        "distance": 1.1729654452184748
+      }
+    ],
+    "final_answer": "The data covers four countries:\n\n1. Paraguay\n2. Saudi Arabia\n3. Bolivia\n4. Ecuador",
+    "sources": [
+      "country_performance:Paraguay|2023",
+      "country_performance:Saudi Arabia|2022",
+      "country_performance:Bolivia|2023",
+      "country_performance:Ecuador|2024",
+      "country_performance:Bolivia|2024"
+    ],
+    "timing_s": {
+      "embed": 0.148,
+      "classify": 0.0,
+      "retrieve": 0.007,
+      "full_get_rag_reply": 2.77
+    },
+    "id": "count_countries"
+  },
+  {
+    "question": "How is India performing in music streaming?",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2022"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2026"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2019"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2024"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "India|2022",
+        "distance": 0.8757497096103423
+      },
+      {
+        "source_key": "India|2026",
+        "distance": 0.9062987018521611
+      },
+      {
+        "source_key": "India|2019",
+        "distance": 0.9156924981245184
+      },
+      {
+        "source_key": "India|2023",
+        "distance": 0.9230818203878705
+      },
+      {
+        "source_key": "India|2024",
+        "distance": 0.9252970270153418
+      }
+    ],
+    "final_answer": "India's performance in music streaming is mixed, with a fluctuating market share and growth rate over the years. Here are some key observations:\n\n* Market share: The average market share of Spotify in India has decreased from 3.62% in 2022 to 4.10% in 2024, indicating a slight decline.\n* Growth rate: The average growth rate of Spotify's streams in India has also fluctuated, ranging from 6.33% in 2022 to -9.64% in 2026. This indicates that the growth rate is not steady and can be affected by various factors such as changing music trends and competition from other streaming platforms.\n* Top artist: The top artist in India has changed several times over the years, with Unknown Artists being the most recent ones (in both 2022 and 2023). Banjaare became the most recent top artist in 2026, while Anuv Jain took the spot in 2024.\n* Active artists and labels: The number of active artists and labels on Spotify in India has increased over the years, with a notable increase from 364 in 2022 to 402 in 2026.\n\nOverall, India's music streaming performance is dynamic and influenced by various factors. While there are fluctuations in market share and growth rate, the platform continues to grow and evolve with changing music trends and artist popularity.",
+    "sources": [
+      "country_performance:India|2022",
+      "country_performance:India|2026",
+      "country_performance:India|2019",
+      "country_performance:India|2023",
+      "country_performance:India|2024"
+    ],
+    "timing_s": {
+      "embed": 0.081,
+      "classify": 0.0,
+      "retrieve": 0.005,
+      "full_get_rag_reply": 14.384
+    },
+    "id": "country_specific"
+  },
+  {
+    "question": "Tell me about Columbia Records.",
+    "routed_table": "label_performance",
+    "top5_chunks": [
+      {
+        "source_table": "label_performance",
+        "source_key": "Columbia/1019 Records|2023"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Columbia/1019 Records|2021"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Columbia/1019 Records|2024"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Columbia/1019 Records|2025"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Columbia Nashville/columbia Records|2023"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Columbia/1019 Records|2023",
+        "distance": 0.8670678614663254
+      },
+      {
+        "source_key": "Columbia/1019 Records|2021",
+        "distance": 0.8694208957670787
+      },
+      {
+        "source_key": "Columbia/1019 Records|2024",
+        "distance": 0.8708469400453203
+      },
+      {
+        "source_key": "Columbia/1019 Records|2025",
+        "distance": 0.8731315622922775
+      },
+      {
+        "source_key": "Columbia Nashville/columbia Records|2023",
+        "distance": 0.8743675534829041
+      }
+    ],
+    "final_answer": "Unfortunately, the provided context does not contain specific information about a standalone \"Columbia Records\" entity. However, it does mention two separate entities: \n\n- \"Label Columbia/1019 Records\", which seems to be an independent record label or a subsidiary of 1019 Records.\n- \"Label Columbia Nashville/columbia Records\", which appears to refer to the country music division of Columbia Records, a major American record label.\n\nThe context provides information about these two separate entities and their performance in terms of streams and market share. However, it does not provide information on a standalone \"Columbia Records\" entity that is comparable to Columbia Nashville/columbia Records or Label Columbia/1019 Records.",
+    "sources": [
+      "label_performance:Columbia/1019 Records|2023",
+      "label_performance:Columbia/1019 Records|2021",
+      "label_performance:Columbia/1019 Records|2024",
+      "label_performance:Columbia/1019 Records|2025",
+      "label_performance:Columbia Nashville/columbia Records|2023"
+    ],
+    "timing_s": {
+      "embed": 0.298,
+      "classify": 0.0,
+      "retrieve": 0.36,
+      "full_get_rag_reply": 8.145
+    },
+    "id": "label_specific"
+  },
+  {
+    "question": "What is the active_songs count for Brazil?",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2024"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2019"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2022"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2026"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "Brazil|2020"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Brazil|2024",
+        "distance": 0.8693481540442909
+      },
+      {
+        "source_key": "Brazil|2019",
+        "distance": 0.8800701318776606
+      },
+      {
+        "source_key": "Brazil|2022",
+        "distance": 0.8866439317236049
+      },
+      {
+        "source_key": "Brazil|2026",
+        "distance": 0.8897155669394131
+      },
+      {
+        "source_key": "Brazil|2020",
+        "distance": 0.8926461024870261
+      }
+    ],
+    "final_answer": "Unfortunately, I don't have enough context information to determine the \"active_songs\" count for Brazil. The provided data only includes streams, total artists, labels, and market share/ growth rates. There is no explicit mention of the number of active songs or the total number of unique tracks available on the platform in Brazil.",
+    "sources": [
+      "country_performance:Brazil|2024",
+      "country_performance:Brazil|2019",
+      "country_performance:Brazil|2022",
+      "country_performance:Brazil|2026",
+      "country_performance:Brazil|2020"
+    ],
+    "timing_s": {
+      "embed": 0.142,
+      "classify": 0.0,
+      "retrieve": 0.008,
+      "full_get_rag_reply": 4.61
+    },
+    "id": "missing_field_probe"
+  },
+  {
+    "question": "What is the weather like today?",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2017"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2020"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2019"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2018"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2026"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2017",
+        "distance": 1.1572380998897442
+      },
+      {
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2020",
+        "distance": 1.158800045278362
+      },
+      {
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2019",
+        "distance": 1.1595834159142842
+      },
+      {
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2018",
+        "distance": 1.1668112642507555
+      },
+      {
+        "source_key": "spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2026",
+        "distance": 1.1710927768573447
+      }
+    ],
+    "final_answer": "I don't have any information about the artist Better Weather's music or streaming data, but I can tell you that I'm a large language model, I don't have real-time access to current weather conditions. The name \"Better Weather\" for an artist doesn't seem to be related to actual weather, so I wouldn't be able to provide you with information about the weather based on this context.",
+    "sources": [
+      "artist_performance:spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2017",
+      "artist_performance:spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2020",
+      "artist_performance:spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2019",
+      "artist_performance:spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2018",
+      "artist_performance:spotify:artist:6dHHmu92q47xdwVxV6W7Fu|2026"
+    ],
+    "timing_s": {
+      "embed": 0.159,
+      "classify": 0.0,
+      "retrieve": 0.389,
+      "full_get_rag_reply": 6.153
+    },
+    "id": "out_of_scope"
+  },
+  {
+    "question": "How is the label Jordan performing?",
+    "routed_table": "label_performance",
+    "top5_chunks": [
+      {
+        "source_table": "label_performance",
+        "source_key": "Jordan Rys|2021"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Jordan Sandhu|2022"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Jordan Sandhu|2020"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Ynw Jordan|2020"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Jordan Massey|2020"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "Jordan Rys|2021",
+        "distance": 0.8784783911373238
+      },
+      {
+        "source_key": "Jordan Sandhu|2022",
+        "distance": 0.9185065134966904
+      },
+      {
+        "source_key": "Jordan Sandhu|2020",
+        "distance": 0.922398984025212
+      },
+      {
+        "source_key": "Ynw Jordan|2020",
+        "distance": 0.9324545194155602
+      },
+      {
+        "source_key": "Jordan Massey|2020",
+        "distance": 0.9570004205214514
+      }
+    ],
+    "final_answer": "Based on the provided context, it appears that Label Jordan is performing poorly. The average total streams for a year is very low across all artists associated with the label, ranging from 1,243 (Label Jordan Massey in 2020) to 2,709 (Label Jordan Rys in 2021). Additionally, the market share and catalog hit rate averages are both extremely low or at zero. Overall, it seems that Label Jordan is struggling to gain traction on Spotify.",
+    "sources": [
+      "label_performance:Jordan Rys|2021",
+      "label_performance:Jordan Sandhu|2022",
+      "label_performance:Jordan Sandhu|2020",
+      "label_performance:Ynw Jordan|2020",
+      "label_performance:Jordan Massey|2020"
+    ],
+    "timing_s": {
+      "embed": 0.103,
+      "classify": 0.0,
+      "retrieve": 0.341,
+      "full_get_rag_reply": 6.133
+    },
+    "id": "nonexistent_entity"
+  },
+  {
+    "question": "How is Georgia doing?",
+    "routed_table": null,
+    "top5_chunks": [
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2019"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Georgia Box|2019"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2018"
+      },
+      {
+        "source_table": "artist_performance",
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2020"
+      },
+      {
+        "source_table": "label_performance",
+        "source_key": "Tbilisi Records|2025"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2019",
+        "distance": 1.09794401150454
+      },
+      {
+        "source_key": "Georgia Box|2019",
+        "distance": 1.1013876052427782
+      },
+      {
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2018",
+        "distance": 1.103623754554432
+      },
+      {
+        "source_key": "spotify:artist:06knYh538h5SI7OAEF8ek3|2020",
+        "distance": 1.104145241775421
+      },
+      {
+        "source_key": "Tbilisi Records|2025",
+        "distance": 1.116415330490866
+      }
+    ],
+    "final_answer": "Based on the provided context, it appears that there are two distinct artists named \"Georgia\" and a record label also named \"Georgia Box\".\n\nThe first \"Georgia\", which has Spotify tracks with an active song(s), had:\n\n* Total streams in 2019: 5,678,475\n* Average catalog hit rate in 2019: 16.67%\n* Average chart strength in 2019: 39.29%\n\nIn contrast, the second \"Georgia\" (not clear if it's the same artist) has no listed data for 2018 or 2020.\n\nIt is also unclear how \"Georgia Box\" and \"Tbilisi Records\" are related to the artists named Georgia.",
+    "sources": [
+      "artist_performance:spotify:artist:06knYh538h5SI7OAEF8ek3|2019",
+      "label_performance:Georgia Box|2019",
+      "artist_performance:spotify:artist:06knYh538h5SI7OAEF8ek3|2018",
+      "artist_performance:spotify:artist:06knYh538h5SI7OAEF8ek3|2020",
+      "label_performance:Tbilisi Records|2025"
+    ],
+    "timing_s": {
+      "embed": 0.119,
+      "classify": 0.0,
+      "retrieve": 0.339,
+      "full_get_rag_reply": 8.509
+    },
+    "id": "ambiguous_entity"
+  },
+  {
+    "question": "how is india doing",
+    "routed_table": "country_performance",
+    "top5_chunks": [
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2022"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2019"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2023"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2026"
+      },
+      {
+        "source_table": "country_performance",
+        "source_key": "India|2020"
+      }
+    ],
+    "top5_distances": [
+      {
+        "source_key": "India|2022",
+        "distance": 1.185626358811681
+      },
+      {
+        "source_key": "India|2019",
+        "distance": 1.2132327078045428
+      },
+      {
+        "source_key": "India|2023",
+        "distance": 1.2146994452923299
+      },
+      {
+        "source_key": "India|2026",
+        "distance": 1.2151738052699128
+      },
+      {
+        "source_key": "India|2020",
+        "distance": 1.215373570738849
+      }
+    ],
+    "final_answer": "Based on the provided context, India's performance on Spotify can be analyzed from different angles:\n\n* Market Share:\n\t+ In 2019, India had an average market share of 0.60%. (Source: Spotify 2019 data)\n\t+ In 2023, India's market share was 4.75%, indicating significant growth.\n\t+ In 2026, India's market share dropped to 5.38%, with a decline of 9.64% compared to the previous year.\n\n* Stream Growth:\n\t+ Between 2019 and 2020, India experienced a 6.19% growth in streams. (Source: Spotify 2020 data)\n\t+ Between 2020 and 2023, India's stream growth was -1.76%, indicating a slight decline.\n\t+ Between 2023 and 2026, India's stream growth was -9.64%, marking a significant slowdown.\n\n* Top Artist and Label:\n\t+ The most recent top artist in India has changed several times, with \"Unknown Artist\" being the current top artist.\n\t+ T-series has been the top label for a period, but it changed to Sony Music Entertainment India Pvt. Ltd. in 2022.\n\t+ In 2026, Banjaare became the new top artist and T-series retained its position as the top label.\n\nOverall, while India's market share and stream growth have shown significant fluctuations over the years, the country remains a notable presence on Spotify, with a diverse range of artists and labels represented.",
+    "sources": [
+      "country_performance:India|2022",
+      "country_performance:India|2019",
+      "country_performance:India|2023",
+      "country_performance:India|2026",
+      "country_performance:India|2020"
+    ],
+    "timing_s": {
+      "embed": 0.12,
+      "classify": 0.0,
+      "retrieve": 0.004,
+      "full_get_rag_reply": 15.687
+    },
+    "id": "lowercase_entity"
+  }
+]

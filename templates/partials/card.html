@@ -1,0 +1,15 @@
+{% comment %}
+Generic content card (icon + title + text) used across Home, Architecture,
+Pipeline Overview, and Documentation. Usage:
+  {% include 'partials/card.html' with icon="bi-cloud-upload" title="Ingestion" text="Raw data lands here." %}
+`icon` is any Bootstrap Icons class name; all fields are optional.
+{% endcomment %}
+<div class="app-card h-100">
+  {% if icon %}
+    <div class="app-card-icon">
+      <i class="bi {{ icon }}"></i>
+    </div>
+  {% endif %}
+  {% if title %}<h5 class="app-card-title">{{ title }}</h5>{% endif %}
+  {% if text %}<p class="app-card-text">{{ text }}</p>{% endif %}
+</div>

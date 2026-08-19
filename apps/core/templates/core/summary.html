@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Summary{% endblock %}
+{% block meta_description %}StreamPulse — a CDAC Big Data Engineering project: Spotify streaming data turned into a live dashboard and a RAG chatbot.{% endblock %}
+
+{% block content %}
+{% url 'chatbot:index' as chatbot_url %}
+
+<section class="page-section page-hero">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="CDAC Big Data Engineering — Group Project" title="StreamPulse" subtitle="An end-to-end data platform that turns Spotify streaming data into a live analytics dashboard and a conversational AI chatbot — built on a Bronze/Silver/Gold pipeline, deployed live on AWS." align="text-start" %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    <div class="stat-strip">
+      {% for stat in gold_stats %}
+        <div class="stat-item">
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="The Idea" title="Data too messy for a spreadsheet, made askable" subtitle="Spotify streaming data is huge and scattered — no dashboard can pre-build every chart a stakeholder might want. So instead of only shipping visualizations, we built a chatbot: ask it a question in plain English, and it retrieves the real answer from the same trustworthy data the dashboard runs on — never a guess." align="text-start" %}
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="What You Can Ask It" title="Full parity with the BI dashboard" align="text-start" %}
+    <div class="row g-4">
+      {% for cap in capabilities %}
+        <div class="col-md-6 col-lg-4">
+          {% include 'partials/card.html' with icon=cap.icon title=cap.title text=cap.text %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="How the Chatbot Thinks" title="Seven deliberate steps, every question" align="text-start" %}
+    <div class="row g-4">
+      {% for step in rag_pipeline %}
+        <div class="col-md-6 col-lg-4">
+          <div class="app-card h-100 pipeline-step-card">
+            <span class="pipeline-step-number">{{ step.step }}</span>
+            <h5 class="app-card-title">{{ step.title }}</h5>
+            <p class="app-card-text">{{ step.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section-alt">
+  <div class="container reveal">
+    {% include 'partials/section_header.html' with eyebrow="Built With" title="Tech Stack" align="text-start" %}
+    <div class="tech-badge-row" style="justify-content: flex-start;">
+      {% for tech in tech_stack %}
+        <span class="tech-badge"><i class="bi {{ tech.icon }}"></i>{{ tech.label }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="page-section text-center">
+  <div class="container reveal">
+    <p class="section-subtitle mx-auto mb-4">See it for yourself.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      {% include 'partials/button.html' with href=chatbot_url label="Try the Chatbot" icon="bi-chat-dots" %}
+    </div>
+  </div>
+</section>
+{% endblock %}

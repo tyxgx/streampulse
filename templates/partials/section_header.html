@@ -1,0 +1,10 @@
+{% comment %}
+Reusable section heading. Usage:
+  {% include 'partials/section_header.html' with eyebrow="Overview" title="Section Title" subtitle="Optional supporting copy." align="text-center" %}
+`align` defaults to text-center; pass "text-start" for left-aligned sections.
+{% endcomment %}
+<div class="section-header {{ align|default:'text-center' }} mb-5">
+  {% if eyebrow %}<span class="section-eyebrow">{{ eyebrow }}</span>{% endif %}
+  <h2 class="section-title">{{ title }}</h2>
+  {% if subtitle %}<p class="section-subtitle {% if align == 'text-center' or not align %}mx-auto{% endif %}">{{ subtitle }}</p>{% endif %}
+</div>

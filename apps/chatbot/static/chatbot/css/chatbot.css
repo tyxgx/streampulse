@@ -1,0 +1,284 @@
+/* Chatbot page: chat window, message bubbles, typing indicator. */
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  box-shadow: var(--shadow-sm);
+  height: 34rem;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+/* AI-branded avatar: a soft green glow ring breathes continuously behind
+   the icon — reads as "listening/active," a small, deliberate use of the
+   accent for the one element on this page whose whole job is to signal
+   "this is the AI." */
+.chat-header-avatar {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(30, 215, 96, 0.14);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.chat-header-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(30, 215, 96, 0.4);
+  animation: chat-avatar-pulse 2.4s ease-out infinite;
+}
+@keyframes chat-avatar-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 215, 96, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(30, 215, 96, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 215, 96, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-header-avatar::after {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(30, 215, 96, 0.2);
+  }
+}
+
+.chat-status {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.chat-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: inline-block;
+}
+
+/* Faint, static sine-wave watermark echoing the hero — a background
+   texture, not a moving element, so it doesn't compete with reading the
+   conversation. */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background-color: var(--color-surface-alt);
+  /* Opacity is baked into the SVG stroke itself (stroke-opacity), not
+     applied via a CSS layer — a CSS opacity on this element would also
+     fade the message bubbles sitting on top of it. */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='400' height='120' viewBox='0 0 400 120'%3e%3cpath d='M0,60 C33,25 67,95 100,60 C133,25 167,95 200,60 C233,25 267,95 300,60 C333,25 367,95 400,60' fill='none' stroke='%231ED760' stroke-opacity='0.06' stroke-width='2'/%3e%3c/svg%3e");
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: 400px 120px;
+}
+
+.chat-message {
+  display: flex;
+}
+.chat-message-user {
+  justify-content: flex-end;
+}
+.chat-message-bot {
+  justify-content: flex-start;
+}
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.chat-bubble {
+  max-width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.chat-message-bot .chat-bubble {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-body);
+  border-bottom-left-radius: 0.25rem;
+}
+.chat-message-user .chat-bubble {
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+  border-bottom-right-radius: 0.25rem;
+}
+
+/* Typing indicator: communicates a pending async response. Freezes to a
+   static (still-visible) three-dot state under reduced motion instead of
+   bouncing. */
+.chat-typing-bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+}
+.chat-typing-bubble span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: inline-block;
+  animation: chat-typing-bounce 1.2s infinite ease-in-out;
+}
+.chat-typing-bubble span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.chat-typing-bubble span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes chat-typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-0.25rem);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-typing-bubble span {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* Markdown rendered inside bot bubbles (marked.js + DOMPurify output) —
+   reuses the same tokens as the rest of the chat window, no new colors. */
+.chat-bubble p {
+  margin: 0 0 0.5rem;
+}
+.chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+.chat-bubble ul,
+.chat-bubble ol {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+}
+.chat-bubble li {
+  margin-bottom: 0.2rem;
+}
+.chat-bubble strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.chat-bubble h1,
+.chat-bubble h2,
+.chat-bubble h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.chat-bubble table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+.chat-bubble th,
+.chat-bubble td {
+  border: 1px solid var(--color-border);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+.chat-bubble th {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+/* Sources chip row, shown under a bot reply when data.sources is non-empty. */
+.chat-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.chat-source-chip {
+  background: var(--chip-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+
+/* Fixed suggestion-chip row, always visible above the input (not part of
+   the scrollable .chat-messages history) — see chatbot.html's comment for
+   why this exists separately from the initial greeting message. */
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+}
+.chat-suggestions-label {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 600;
+  margin-right: 0.15rem;
+}
+.chat-suggestion-chip {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--color-body);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.chat-suggestion-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.chat-suggestion-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-card);
+}
+.chat-send-btn {
+  flex-shrink: 0;
+  width: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
