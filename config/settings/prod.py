@@ -12,11 +12,18 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# IP-only deployments (no domain/TLS termination in front of Nginx) need to
+# opt out of the TLS-forcing settings below, or every request loops
+# redirecting to an https:// URL that doesn't exist. Defaults to True (the
+# secure behavior) so nothing changes for anyone who does have TLS -- only
+# set DJANGO_FORCE_TLS=false explicitly for a known IP-only deployment.
+_force_tls = env.bool('DJANGO_FORCE_TLS', default=True)
+
+SECURE_SSL_REDIRECT = _force_tls
+SESSION_COOKIE_SECURE = _force_tls
+CSRF_COOKIE_SECURE = _force_tls
+SECURE_HSTS_SECONDS = 31536000 if _force_tls else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _force_tls
+SECURE_HSTS_PRELOAD = _force_tls
 
 CORS_ALLOW_ALL_ORIGINS = False
