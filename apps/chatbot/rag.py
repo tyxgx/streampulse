@@ -1373,6 +1373,14 @@ def _call_llm(prompt, system_prompt=None):
             # letting this become a hard failure.
             if e.response is not None and e.response.status_code == 429:
                 cache.mark_exhausted('gemini')
+            elif e.response is not None and 500 <= e.response.status_code < 600:
+                # A transient 5xx (Service Unavailable, Bad Gateway, etc.)
+                # is Google's outage, not our quota or a malformed request
+                # -- found live: Gemini returned a plain 503 and this branch
+                # re-raised it, killing the whole request before Groq ever
+                # got a chance, same failure mode the timeout handling below
+                # already covers for a different symptom. Same recovery.
+                pass
             else:
                 raise
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
@@ -1393,6 +1401,8 @@ def _call_llm(prompt, system_prompt=None):
         except requests.exceptions.HTTPError as e:
             if e.response is not None and e.response.status_code == 429:
                 cache.mark_exhausted('groq')
+            elif e.response is not None and 500 <= e.response.status_code < 600:
+                pass
             else:
                 raise
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
