@@ -1,0 +1,92 @@
+name: daily-refresh
+
+# Pulls the Kaggle spotify-charts-daily-updated dataset, rebuilds Silver/Gold
+# incrementally with DuckDB (pipeline/refresh.py) and syncs the result to S3.
+# First run (empty S3) is a full-history bootstrap: trigger it by hand.
+on:
+  schedule:
+    - cron: "30 3 * * *"   # 03:30 UTC, after Kaggle's daily update
+  workflow_dispatch: {}
+
+concurrency:
+  group: lake-refresh
+  cancel-in-progress: false
+
+env:
+  LAKE_BUCKET: ${{ vars.LAKE_BUCKET }}        # streampulse-lake-dev-data
+  AWS_REGION: ${{ vars.AWS_REGION }}          # ap-south-1
+  KAGGLE_SLUG: gonzalopezgil/spotify-charts-daily-updated
+  KAGGLE_FILE: charts_songs_daily.csv
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space (the CSV alone is ~10 GB)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h / /mnt
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - run: pip install -r pipeline/requirements.txt pytest
+
+      - name: Unit tests
+        run: python -m pytest -q pipeline/tests
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Pull existing lake (gold + last two months of silver)
+        run: |
+          mkdir -p lake
+          aws s3 sync "s3://$LAKE_BUCKET/gold" lake/gold --only-show-errors
+          aws s3 sync "s3://$LAKE_BUCKET/state" lake/state --only-show-errors || true
+          for offset in 0 1; do
+            y=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%Y)
+            m=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%-m)
+            aws s3 sync "s3://$LAKE_BUCKET/silver/song_charts/year=$y/month=$m" \
+              "lake/silver/song_charts/year=$y/month=$m" --only-show-errors || true
+          done
+          du -sh lake || true
+
+      - name: Download Kaggle CSV
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          sudo mkdir -p /mnt/kaggle && sudo chown "$USER" /mnt/kaggle
+          kaggle datasets download -d "$KAGGLE_SLUG" -f "$KAGGLE_FILE" -p /mnt/kaggle --force
+          cd /mnt/kaggle && { [ -f "$KAGGLE_FILE" ] || unzip -o "$KAGGLE_FILE.zip"; }
+          ls -lh /mnt/kaggle
+
+      - name: Refresh Silver + Gold
+        working-directory: pipeline
+        run: python refresh.py --csv "/mnt/kaggle/$KAGGLE_FILE" --lake "$GITHUB_WORKSPACE/lake" --memory-limit 5GB | tee ../run_summary.json
+
+      - name: Push to S3
+        run: |
+          if grep -q '"status": "up_to_date"' run_summary.json; then echo "nothing new"; exit 0; fi
+          aws s3 sync lake/gold "s3://$LAKE_BUCKET/gold" --delete --only-show-errors
+          while read -r part; do
+            aws s3 sync "lake/silver/song_charts/$part" "s3://$LAKE_BUCKET/silver/song_charts/$part" \
+              --delete --only-show-errors
+          done < lake/state/affected_partitions.txt
+          aws s3 cp lake/state/last_run.json "s3://$LAKE_BUCKET/state/last_run.json"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo '### Lake refresh' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"; cat run_summary.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
