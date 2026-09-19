@@ -97,3 +97,16 @@ def test_late_arriving_rows_within_lookback_are_picked_up(tmp_path):
     refresh.run(str(tmp_path / "b.csv"), scratch, memory_limit="1GB")
     for t in TABLES:
         assert snapshot(lake, t) == snapshot(scratch, t), t
+
+
+def test_bootstrap_and_incremental_across_a_year_boundary(tmp_path):
+    early = ["2024-12-30", "2024-12-31", "2025-01-01"]
+    late = early + ["2025-01-02", "2026-01-15"]  # gap year + new year
+    write_csv(tmp_path / "a.csv", early)
+    write_csv(tmp_path / "b.csv", late)
+    inc, scratch = tmp_path / "inc", tmp_path / "scratch"
+    refresh.run(str(tmp_path / "a.csv"), inc, memory_limit="1GB")
+    refresh.run(str(tmp_path / "b.csv"), inc, memory_limit="1GB")
+    refresh.run(str(tmp_path / "b.csv"), scratch, memory_limit="1GB")
+    for t in TABLES:
+        assert snapshot(inc, t) == snapshot(scratch, t), t

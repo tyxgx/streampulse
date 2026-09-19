@@ -89,9 +89,14 @@ def map_sql(mapping, key_expr):
 
 # ---------------------------------------------------------------- Silver
 
-def silver_select(csv_path, min_date):
+def silver_select(csv_path, min_date, before_date=None):
     """Bronze CSV -> cleaned + feature-engineered Silver rows (silver_song_charts.py)."""
-    date_filter = f"WHERE date >= DATE {q(min_date)}" if min_date else ""
+    conds = []
+    if min_date:
+        conds.append(f"date >= DATE {q(min_date)}")
+    if before_date:
+        conds.append(f"date < DATE {q(before_date)}")
+    date_filter = ("WHERE " + " AND ".join(conds)) if conds else ""
     return f"""
     WITH raw AS (
         SELECT * FROM read_csv({q(csv_path)}, header=true, sample_size=200000,
@@ -150,10 +155,17 @@ def build_silver(con, lake, csv_path, watermark):
     select = silver_select(csv_path, watermark)
 
     if watermark is None:
-        log.info("Silver empty -> full-history load")
+        log.info("Silver empty -> full-history load, one year at a time")
         silver_dir.mkdir(parents=True, exist_ok=True)
-        con.execute(f"COPY ({select}) TO {q(silver_dir)} "
-                    "(FORMAT parquet, PARTITION_BY (year, month), COMPRESSION zstd, OVERWRITE_OR_IGNORE)")
+        lo, hi = con.execute(
+            f"SELECT min(date), max(date) FROM read_csv({q(csv_path)}, header=true, sample_size=200000, "
+            "types={'date':'DATE'}, ignore_errors=true)").fetchone()
+        for year in range(lo.year, hi.year + 1):
+            t = time.time()
+            sel = silver_select(csv_path, f"{year}-01-01", f"{year + 1}-01-01")
+            con.execute(f"COPY ({sel}) TO {q(silver_dir)} "
+                        "(FORMAT parquet, PARTITION_BY (year, month), COMPRESSION zstd, OVERWRITE_OR_IGNORE)")
+            log.info("silver %d done in %.0fs", year, time.time() - t)
         return con.execute(
             f"SELECT DISTINCT year, month FROM read_parquet({q(parquet_glob(lake, 'silver/song_charts'))}, "
             "hive_partitioning=1) ORDER BY 1, 2").fetchall()
@@ -361,12 +373,20 @@ def run(csv_path, lake, memory_limit="5GB", temp_dir=None, exclude_partial_month
     if not affected:
         return {"status": "up_to_date", "watermark": latest_before}
 
-    silver_view(con, lake, affected)
-    gold_new_tables(con, partial_month(con, lake) if exclude_partial_month else None)
-    for t in PARTITIONED_GOLD:
-        write_partitioned(con, lake, t, affected)
-    for t in WHOLE_GOLD:
-        write_whole(con, lake, t, affected, growth=t != "track_catalog")
+    # One year of months per pass keeps the unnest/aggregate working set small
+    # (the full-history bootstrap would otherwise materialise ~65M artist rows).
+    # Chronological order matters: growth_percentage and track_catalog are
+    # recomputed against everything already written.
+    partial = partial_month(con, lake) if exclude_partial_month else None
+    for year in sorted({y for y, _ in affected}):
+        batch = [(y, m) for y, m in affected if y == year]
+        log.info("gold %d: months %s", year, [m for _, m in batch])
+        silver_view(con, lake, batch)
+        gold_new_tables(con, partial)
+        for t in PARTITIONED_GOLD:
+            write_partitioned(con, lake, t, batch)
+        for t in WHOLE_GOLD:
+            write_whole(con, lake, t, batch, growth=t != "track_catalog")
 
     new_wm = get_watermark(con, lake)
     summary = {

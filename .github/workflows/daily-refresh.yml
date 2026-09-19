@@ -72,6 +72,7 @@ jobs:
 
       - name: Refresh Silver + Gold
         working-directory: pipeline
+        shell: bash
         run: python refresh.py --csv "/mnt/kaggle/$KAGGLE_FILE" --lake "$GITHUB_WORKSPACE/lake" --memory-limit 5GB | tee ../run_summary.json
 
       - name: Push to S3
