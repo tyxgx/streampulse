@@ -16,7 +16,6 @@ urlpatterns = [
     path('api/', include('apps.api.urls')),
     path('chatbot/', include('apps.chatbot.urls')),
     path('documentation/', include('apps.documentation.urls')),
-    path('team/', include('apps.team.urls')),
     path('contact/', include('apps.contact.urls')),
     # core is mounted at the root so Home/About/Architecture/Pipeline
     # Overview resolve to '/', '/about/', etc.

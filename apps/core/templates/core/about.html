@@ -3,13 +3,12 @@
 {% block title %}About Project{% endblock %}
 
 {% block content %}
-{% url 'team:index' as team_url %}
 
 <section class="page-section page-hero">
   <div class="container">
     {% include 'partials/section_header.html' with eyebrow="About" title="About the Project" align="text-start" %}
     <p class="section-subtitle" style="max-width: 48rem;">
-      This project was built by a group of CDAC Big Data Engineering students to demonstrate how raw
+      I built this project to demonstrate how raw
       Spotify streaming data can be ingested, transformed through a Bronze/Silver/Gold medallion
       pipeline on AWS S3, and served through a conversational,
       retrieval-augmented chatbot. The full stack — Postgres with pgvector for retrieval, Redis for
@@ -39,10 +38,4 @@
   </div>
 </section>
 
-<section class="page-section text-center">
-  <div class="container">
-    <p class="section-subtitle mx-auto mb-4">Curious who built this?</p>
-    {% include 'partials/button.html' with href=team_url label="Meet the Team" icon="bi-arrow-right" %}
-  </div>
-</section>
 {% endblock %}

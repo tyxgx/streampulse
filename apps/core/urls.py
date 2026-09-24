@@ -16,7 +16,7 @@ urlpatterns = [
     # speakers, not a public marketing page.
     path('rag-pipeline/', views.RagPipelineWalkthroughView.as_view(), name='rag_pipeline_walkthrough'),
     # Also deliberately unlinked — a shareable one-pager for sending
-    # directly to someone outside the team, not part of site navigation.
+    # directly to someone outside the project, not part of site navigation.
     path('summary/', views.ProjectSummaryView.as_view(), name='summary'),
     # Pipeline Overview was folded into the Architecture page — this route
     # stays alive as a permanent redirect so any existing links/bookmarks

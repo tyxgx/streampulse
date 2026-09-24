@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}Project Summary{% endblock %}
-{% block meta_description %}StreamPulse — a CDAC Big Data Engineering project: Spotify streaming data turned into a live dashboard and a RAG chatbot.{% endblock %}
+{% block meta_description %}StreamPulse — a Big Data Engineering project: Spotify streaming data turned into a live dashboard and a RAG chatbot.{% endblock %}
 
 {% block content %}
 {% url 'chatbot:index' as chatbot_url %}
 
 <section class="page-section page-hero">
   <div class="container reveal">
-    {% include 'partials/section_header.html' with eyebrow="CDAC Big Data Engineering — Group Project" title="StreamPulse" subtitle="An end-to-end data platform that turns Spotify streaming data into a live analytics dashboard and a conversational AI chatbot — built on a Bronze/Silver/Gold pipeline, deployed live on AWS." align="text-start" %}
+    {% include 'partials/section_header.html' with eyebrow="Big Data Engineering Project" title="StreamPulse" subtitle="An end-to-end data platform that turns Spotify streaming data into a live analytics dashboard and a conversational AI chatbot — built on a Bronze/Silver/Gold pipeline, deployed live on AWS." align="text-start" %}
   </div>
 </section>
 

@@ -1,6 +1,6 @@
 {% comment %}
 Shared site footer. The GitHub link is a placeholder ("#") until the
-team's real repository URL is available — update REPO_URL below when it is.
+project's real repository URL is available — update REPO_URL below when it is.
 {% endcomment %}
 <footer class="site-footer">
   <div class="container py-5">
@@ -10,7 +10,7 @@ team's real repository URL is available — update REPO_URL below when it is.
           <i class="bi bi-diagram-3"></i> StreamPulse
         </h5>
         <p class="footer-text">
-          A CDAC Big Data Engineering group project demonstrating an
+          A Big Data Engineering project demonstrating an
           end-to-end data pipeline — ingestion through Bronze, Silver, and
           Gold layers — feeding a RAG-powered chatbot.
         </p>
@@ -29,7 +29,6 @@ team's real repository URL is available — update REPO_URL below when it is.
         <h6 class="text-white fw-semibold mb-3">Platform</h6>
         <ul class="list-unstyled footer-links">
           <li><a href="{% url 'chatbot:index' %}">RAG Chatbot</a></li>
-          <li><a href="{% url 'team:index' %}">Team</a></li>
         </ul>
       </div>
 
@@ -50,7 +49,7 @@ team's real repository URL is available — update REPO_URL below when it is.
 
   <div class="footer-bottom py-3">
     <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 text-center">
-      <small>&copy; {% now "Y" %} StreamPulse — CDAC Big Data Engineering Project</small>
+      <small>&copy; {% now "Y" %} StreamPulse — Big Data Engineering Project</small>
       <div class="d-flex align-items-center gap-3">
         <small>Built with Django &amp; Django REST Framework</small>
         <a href="#top" class="footer-back-to-top">Back to top <i class="bi bi-arrow-up"></i></a>

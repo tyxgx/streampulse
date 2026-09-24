@@ -712,7 +712,7 @@ _SUPERLATIVE_KEYWORDS = [
 _ASCENDING_KEYWORDS = ['least', 'lowest', 'worst', 'bottom']
 
 # Four keyword sets added to close a gap found by cross-checking this
-# module against a separate Tableau dashboard the team also ships: it has
+# module against a separate Tableau dashboard also shipped alongside it: it has
 # widgets (catalog hit rate, a growth-percentage map/ranking, label market
 # share, and a full multi-year streaming trend) with no equivalent
 # deterministic intent here, so those questions previously fell through to

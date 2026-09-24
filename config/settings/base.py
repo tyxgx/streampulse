@@ -47,7 +47,6 @@ LOCAL_APPS = [
     'apps.chatbot.apps.ChatbotConfig',
     'apps.gold_data.apps.GoldDataConfig',
     'apps.documentation.apps.DocumentationConfig',
-    'apps.team.apps.TeamConfig',
     'apps.contact.apps.ContactConfig',
     'apps.api.apps.ApiConfig',
 ]
@@ -133,7 +132,7 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'StreamPulse API',
     'DESCRIPTION': (
-        'API layer for the CDAC Big Data Engineering project. Endpoints '
+        'API layer for the StreamPulse Big Data Engineering project. Endpoints '
         'currently return demo/placeholder data and are designed to be '
         'swapped for live pipeline data without changing the contract.'
     ),

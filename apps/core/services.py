@@ -10,7 +10,7 @@ Writing pattern used throughout this file: every card/caption opens with a
 plain-English clause anyone can follow, then backs it up with the precise
 technical detail — so the page works for a first-time visitor and a
 mid-level technical reader at once. This matters because the Architecture
-page doubles as the visual aid for the team's live presentation.
+page doubles as the visual aid for live presentations.
 """
 
 
