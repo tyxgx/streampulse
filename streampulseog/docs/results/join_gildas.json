@@ -1,0 +1,13 @@
+{
+  "source": "gildas",
+  "note": "HF GildasLeDrogoff/spotify-huge-track-analysis-dataset, 56,277,664 rows (track x artist), CC-BY-NC-4.0, origin not stated in the card. Measured 2026-09-25 by Claude with a scratch script (not via run_logs); numbers copied from that run.",
+  "usable_filter": null,
+  "our_tracks": 250248,
+  "matched_tracks": 166369,
+  "matched_pct_tracks": 66.5,
+  "matched_pct_chart_rows": 81.5,
+  "matched_pct_streams": 81.8,
+  "by_last_year_pct": {"2017": 51, "2018": 55, "2019": 63, "2020": 64, "2021": 69, "2022": 75, "2023": 78, "2024": 84, "2025": 75, "2026": 45},
+  "columns": ["track_id", "artist_name", "track_name", "album_name", "album_release_date", "duration_ms", "explicit", "track_number", "disc_number", "track_popularity", "album_popularity", "track_vs_album_popularity", "artist_popularity", "artist_followers", "album_vs_artist_popularity", "tempo", "key", "mode", "danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "liveness", "valence", "energy_danceability_score"],
+  "seconds": 117
+}

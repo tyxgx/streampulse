@@ -1,0 +1,42 @@
+{
+  "source": "ozefe",
+  "note": "256M rows, license 'other' (spotify-developer-terms); card says raw data = Anna's Archive Spotify scrape.",
+  "usable_filter": "null_response = 0",
+  "our_tracks": 250248,
+  "matched_tracks": 218787,
+  "matched_pct_tracks": 87.4,
+  "matched_pct_chart_rows": 91.7,
+  "matched_pct_streams": 90.4,
+  "by_last_year_pct": {
+    "2017": 95,
+    "2018": 93,
+    "2019": 90,
+    "2020": 91,
+    "2021": 94,
+    "2022": 95,
+    "2023": 95,
+    "2024": 94,
+    "2025": 94,
+    "2026": 51
+  },
+  "columns": [
+    "id",
+    "name",
+    "popularity",
+    "null_response",
+    "duration_ms",
+    "time_signature",
+    "key",
+    "mode",
+    "tempo",
+    "danceability",
+    "energy",
+    "loudness",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence"
+  ],
+  "seconds": 4406
+}

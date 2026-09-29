@@ -1,0 +1,12 @@
+{
+  "source": "maharshi",
+  "note": "HF maharshipandya/spotify-tracks-dataset, 114,000 rows, bsd, has track_genre (125 genres). Measured 2026-09-25 by Claude with a scratch script (not via run_logs).",
+  "usable_filter": null,
+  "our_tracks": 250248,
+  "matched_tracks": 6788,
+  "matched_pct_tracks": 2.7,
+  "matched_pct_chart_rows": 21.3,
+  "matched_pct_streams": 17.8,
+  "by_last_year_pct": {"2017": 2, "2018": 2, "2019": 2, "2020": 3, "2021": 3, "2022": 5, "2023": 3, "2024": 1, "2025": 2, "2026": 3},
+  "seconds": 13
+}
