@@ -1,12 +1,18 @@
 name: daily-refresh
 
-# Pulls the Kaggle spotify-charts-daily-updated dataset, rebuilds Silver/Gold
-# incrementally with DuckDB (pipeline/refresh.py) and syncs the result to S3.
-# First run (empty S3) is a full-history bootstrap: trigger it by hand.
+# Medallion refresh: Kaggle CSV -> Bronze (raw, append-only) -> Silver -> Gold -> serving JSON.
+# pipeline/refresh.py appends only new or changed rows to Bronze, rebuilds the affected Silver
+# months from Bronze, then Gold; build_site_data.py produces the dashboard JSON and chatbot tables.
+# First run with an empty Bronze is a full-history bootstrap.
 on:
   schedule:
     - cron: "30 3 * * *"   # 03:30 UTC, after Kaggle's daily update
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      rebuild_silver:
+        description: "Replay: rebuild ALL of Silver and Gold from Bronze (needs the full Bronze, no Kaggle change)"
+        type: boolean
+        default: false
 
 permissions:
   id-token: write   # GitHub OIDC -> AWS role (no long-lived keys)
@@ -51,17 +57,21 @@ jobs:
           role-to-assume: arn:aws:iam::922120357133:role/streampulse-github-pipeline
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Pull existing lake (gold + last two months of silver)
+      - name: Pull existing lake (gold, state, last two months of bronze)
         run: |
           mkdir -p lake
           aws s3 sync "s3://$LAKE_BUCKET/gold" lake/gold --only-show-errors
           aws s3 sync "s3://$LAKE_BUCKET/state" lake/state --only-show-errors || true
-          for offset in 0 1; do
-            y=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%Y)
-            m=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%-m)
-            aws s3 sync "s3://$LAKE_BUCKET/silver/song_charts/year=$y/month=$m" \
-              "lake/silver/song_charts/year=$y/month=$m" --only-show-errors || true
-          done
+          if [ "${{ inputs.rebuild_silver }}" = "true" ]; then
+            aws s3 sync "s3://$LAKE_BUCKET/bronze" lake/bronze --only-show-errors || true   # replay needs all of Bronze
+          else
+            for offset in 0 1; do
+              y=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%Y)
+              m=$(date -u -d "$(date -u +%Y-%m-01) -$offset month" +%-m)
+              aws s3 sync "s3://$LAKE_BUCKET/bronze/charts/year=$y/month=$m" \
+                "lake/bronze/charts/year=$y/month=$m" --only-show-errors || true
+            done
+          fi
           du -sh lake || true
 
       - name: Download Kaggle CSV
@@ -74,14 +84,18 @@ jobs:
           cd /mnt/kaggle && { [ -f "$KAGGLE_FILE" ] || unzip -o "$KAGGLE_FILE.zip"; }
           ls -lh /mnt/kaggle
 
-      - name: Refresh Silver + Gold
+      - name: Refresh Bronze, Silver and Gold
         working-directory: pipeline
         shell: bash
-        run: python refresh.py --csv "/mnt/kaggle/$KAGGLE_FILE" --lake "$GITHUB_WORKSPACE/lake" --memory-limit 5GB | tee ../run_summary.json
+        run: |
+          FLAGS=""; [ "${{ inputs.rebuild_silver }}" = "true" ] && FLAGS="--rebuild-silver"
+          python refresh.py --csv "/mnt/kaggle/$KAGGLE_FILE" --lake "$GITHUB_WORKSPACE/lake" --memory-limit 5GB $FLAGS | tee ../run_summary.json
 
       - name: Push to S3
         run: |
           if grep -q '"status": "up_to_date"' run_summary.json; then echo "nothing new"; exit 0; fi
+          # Bronze is append-only: upload new files, never --delete
+          aws s3 sync lake/bronze "s3://$LAKE_BUCKET/bronze" --only-show-errors
           aws s3 sync lake/gold "s3://$LAKE_BUCKET/gold" --delete --only-show-errors
           while read -r part; do
             aws s3 sync "lake/silver/song_charts/$part" "s3://$LAKE_BUCKET/silver/song_charts/$part" \
@@ -105,8 +119,11 @@ jobs:
           aws s3 cp chat_data/_version.json "s3://$LAKE_BUCKET/chat/_version.json" --only-show-errors
           aws s3 sync site_data "s3://$SITE_BUCKET/data" --delete --only-show-errors \
             --cache-control "public, max-age=300" --content-type application/json
+
+      - name: Publish dashboard files
+        run: |
           aws s3 sync dashboard "s3://$SITE_BUCKET" --only-show-errors --cache-control "public, max-age=300" \
-            --exclude "data/*"
+            --exclude "data/*" --exclude "*.md"
 
       - name: Summary
         if: always()

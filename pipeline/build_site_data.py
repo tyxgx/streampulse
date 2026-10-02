@@ -8,6 +8,10 @@ the page only draws charts.
 
     python build_site_data.py --lake ./lake --out ./site_data
 
+Layers: monthly views (global and per-country monthly series, label shares) are served from Gold;
+daily and track-level views come from Silver. A reconciliation check compares Gold with Silver on
+every run and is published on the Data health page.
+
 Numbers are "charted streams": streams of tracks that appear on a country's
 daily top-200 chart, summed over charts. They are not total Spotify streams.
 """
@@ -38,6 +42,24 @@ def rows(con, sql, *params):
     return [dict(zip(cols, r)) for r in cur.fetchall()]
 
 
+GOLD = {"ok": False}
+
+
+def register_gold(con, lake):
+    """Expose the Gold tables this script serves from, if the lake has them."""
+    tables = {"monthly_trends": "g_monthly_trends", "country_performance": "g_country_performance",
+              "label_performance_enhanced": "g_label_performance"}
+    ok = True
+    for t, view in tables.items():
+        path = Path(lake, "gold", t)
+        if any(path.rglob("*.parquet")):
+            con.execute(f"CREATE OR REPLACE VIEW {view} AS SELECT * FROM read_parquet('{path}/**/*.parquet', hive_partitioning=1)")
+        else:
+            ok = False
+    GOLD["ok"] = ok
+    log.info("gold registered: %s", ok)
+
+
 def slug(uri: str) -> str:
     return uri.split(":")[-1]
 
@@ -61,8 +83,12 @@ def build_intermediates(con, silver_glob):
     """)
     con.execute("""
         CREATE OR REPLACE TABLE track_all AS
-        SELECT uri, any_value(track_name) AS track_name,
-               any_value(artist_names) AS artist_names, any_value(label) AS label,
+        -- a track can carry several spellings over time; take the most recent one, with a
+        -- value tie-break so the result is identical on every run (any_value() is arbitrary)
+        SELECT uri,
+               arg_max(track_name, date::VARCHAR || '|' || track_name) AS track_name,
+               arg_max(artist_names, date::VARCHAR || '|' || artist_names) AS artist_names,
+               arg_max(label, date::VARCHAR || '|' || label) AS label,
                sum(streams)::BIGINT AS streams, count(DISTINCT date) AS days,
                min(rank) AS peak_rank, count(DISTINCT market) AS markets,
                min(date) AS first_seen, max(date) AS last_seen
@@ -131,12 +157,18 @@ def build_meta(con, out, mn, mx):
 
 
 def build_overview(con, out, mx):
-    monthly = rows(con, """
-        SELECT strftime(date_trunc('month', date), '%Y-%m') AS ym,
-               sum(streams)::BIGINT AS streams, count(DISTINCT market) AS markets
-        FROM daily_country
-        WHERE date < date_trunc('month', (SELECT max(date) FROM daily_country))
-        GROUP BY 1 ORDER BY 1""")
+    if GOLD["ok"]:   # Gold monthly_trends already leaves out the in-progress month
+        monthly = rows(con, """
+            SELECT printf('%04d-%02d', year, month) AS ym, sum(total_streams)::BIGINT AS streams,
+                   count(DISTINCT country_name) AS markets
+            FROM g_monthly_trends GROUP BY 1 ORDER BY 1""")
+    else:
+        monthly = rows(con, """
+            SELECT strftime(date_trunc('month', date), '%Y-%m') AS ym,
+                   sum(streams)::BIGINT AS streams, count(DISTINCT market) AS markets
+            FROM daily_country
+            WHERE date < date_trunc('month', (SELECT max(date) FROM daily_country))
+            GROUP BY 1 ORDER BY 1""")
     daily = rows(con, """
         SELECT date, sum(streams)::BIGINT AS streams FROM daily_country
         WHERE date > (SELECT max(date) FROM daily_country) - INTERVAL 120 DAY
@@ -174,11 +206,18 @@ def build_countries(con, out, mx):
         ORDER BY last30 DESC NULLS LAST""", mx, mx, mx)
     for c in summary:
         m = c["market"]
-        c["monthly"] = rows(con, """
-            SELECT strftime(date_trunc('month', date), '%Y-%m') AS ym,
-                   sum(streams)::BIGINT AS streams FROM daily_country
-            WHERE market = ? AND date < date_trunc('month', ?::DATE)
-            GROUP BY 1 ORDER BY 1""", m, mx)
+        if GOLD["ok"]:
+            c["monthly"] = rows(con, """
+                SELECT printf('%04d-%02d', year, month) AS ym, total_streams::BIGINT AS streams
+                FROM g_country_performance
+                WHERE country_name = ? AND (year, month) < (year(?::DATE), month(?::DATE))
+                ORDER BY year, month""", c["country_name"], mx, mx)
+        else:
+            c["monthly"] = rows(con, """
+                SELECT strftime(date_trunc('month', date), '%Y-%m') AS ym,
+                       sum(streams)::BIGINT AS streams FROM daily_country
+                WHERE market = ? AND date < date_trunc('month', ?::DATE)
+                GROUP BY 1 ORDER BY 1""", m, mx)
         c["top_tracks"] = rows(con, """
             SELECT t.uri, t.track_name, t.artist_names, tc.streams
             FROM track_country tc JOIN track_all t USING (uri)
@@ -283,16 +322,47 @@ def build_trending(con, out, mx):
 
 
 def build_labels(con, out, mx):
-    labels = rows(con, """
-        SELECT label, sum(streams)::BIGINT AS streams, count(*) AS tracks
-        FROM track_all WHERE label IS NOT NULL GROUP BY 1 ORDER BY 2 DESC LIMIT 25""")
-    by_year = rows(con, """
-        SELECT substr(tm.ym, 1, 4) AS year, t.label, sum(tm.streams)::BIGINT AS streams
-        FROM track_month tm JOIN track_all t USING (uri)
-        WHERE t.label IN (SELECT label FROM track_all WHERE label IS NOT NULL
-                          GROUP BY 1 ORDER BY sum(streams) DESC LIMIT 10)
-        GROUP BY 1, 2 ORDER BY 1, 3 DESC""")
-    dump(out / "labels.json", dict(labels=labels, by_year=by_year))
+    if GOLD["ok"]:
+        labels = rows(con, """
+            SELECT standardized_label AS label, sum(total_streams)::BIGINT AS streams
+            FROM g_label_performance WHERE standardized_label IS NOT NULL
+            GROUP BY 1 ORDER BY 2 DESC LIMIT 25""")
+        by_year = rows(con, """
+            SELECT year::VARCHAR AS year, standardized_label AS label, sum(total_streams)::BIGINT AS streams
+            FROM g_label_performance
+            WHERE standardized_label IN (SELECT standardized_label FROM g_label_performance
+                                         WHERE standardized_label IS NOT NULL GROUP BY 1 ORDER BY sum(total_streams) DESC LIMIT 10)
+            GROUP BY 1, 2 ORDER BY 1, 3 DESC""")
+    else:
+        labels = rows(con, """
+            SELECT label, sum(streams)::BIGINT AS streams, count(*) AS tracks
+            FROM track_all WHERE label IS NOT NULL GROUP BY 1 ORDER BY 2 DESC LIMIT 25""")
+        by_year = rows(con, """
+            SELECT substr(tm.ym, 1, 4) AS year, t.label, sum(tm.streams)::BIGINT AS streams
+            FROM track_month tm JOIN track_all t USING (uri)
+            WHERE t.label IN (SELECT label FROM track_all WHERE label IS NOT NULL
+                              GROUP BY 1 ORDER BY sum(streams) DESC LIMIT 10)
+            GROUP BY 1, 2 ORDER BY 1, 3 DESC""")
+    dump(out / "labels.json", dict(labels=labels, by_year=by_year, source="gold" if GOLD["ok"] else "silver"))
+
+
+def reconcile(con):
+    """Gold must equal Silver month by month (Gold is built from Silver; a gap means a bug or a partial write)."""
+    if not GOLD["ok"]:
+        return None
+    r = rows(con, """
+        WITH s AS (SELECT year(date) AS y, month(date) AS m, sum(streams)::BIGINT AS st FROM daily_country GROUP BY 1, 2),
+             g AS (SELECT year AS y, month AS m, sum(total_streams)::BIGINT AS st FROM g_monthly_trends GROUP BY 1, 2)
+        SELECT count(*) AS months, coalesce(sum(abs(s.st - g.st)), 0)::BIGINT AS abs_diff,
+               coalesce(max(abs(s.st - g.st) * 1.0 / nullif(s.st, 0)), 0) AS max_rel
+        FROM s JOIN g USING (y, m)""")[0]
+    missing = rows(con, """
+        SELECT count(*) AS n FROM (SELECT year(date) AS y, month(date) AS m FROM daily_country GROUP BY 1, 2
+                                   EXCEPT SELECT year, month FROM g_monthly_trends)""")[0]["n"]
+    # the in-progress month is intentionally absent from Gold monthly_trends
+    r["months_missing_in_gold"] = missing
+    r["ok"] = r["max_rel"] < 1e-4 and missing <= 1
+    return r
 
 
 def build_seasonality(con, out, mx):
@@ -328,6 +398,7 @@ def build_health(con, out, mn, mx):
     stale = rows(con, """
         SELECT country_name, max(date) AS last_date FROM daily_country
         GROUP BY 1 HAVING max(date) < ?::DATE - INTERVAL 3 DAY ORDER BY 2""", mx)
+    rec = reconcile(con)
     today = dt.datetime.now(dt.timezone.utc).date()
     lag = (today - mx).days
     expected = 200 * max(r["markets"] for r in per_day)
@@ -342,8 +413,11 @@ def build_health(con, out, mn, mx):
         dict(name="Missing rank/artist", ok=nulls["no_rank"] == 0 and nulls["no_artist"] == 0,
              detail=f"{nulls['no_rank']} no rank, {nulls['no_artist']} no artist"),
     ]
+    if rec:
+        checks.append(dict(name="Gold matches Silver", ok=rec["ok"],
+                           detail=f"{rec['months']} months compared, largest gap {100 * rec['max_rel']:.4f}%"))
     dump(out / "health.json", dict(as_of=mx, first_date=mn, per_day=per_day,
-                                   nulls=nulls, checks=checks, stale_markets=stale,
+                                   nulls=nulls, checks=checks, stale_markets=stale, reconciliation=rec,
                                    all_ok=all(c["ok"] for c in checks)))
 
 
@@ -376,6 +450,7 @@ def main():
     con.execute(f"SET memory_limit='{args.memory_limit}'; SET threads={args.threads}")
     t0 = time.time()
     build_intermediates(con, f"{args.lake}/silver/song_charts/**/*.parquet")
+    register_gold(con, args.lake)
     mn, mx = window_dates(con)
     log.info("date range %s .. %s (%.0fs)", mn, mx, time.time() - t0)
     meta = build_meta(con, out, mn, mx)
