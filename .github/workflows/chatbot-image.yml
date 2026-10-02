@@ -40,8 +40,14 @@ jobs:
           if aws lambda get-function --function-name "$FUNCTION" >/dev/null 2>&1; then
             aws lambda update-function-code --function-name "$FUNCTION" \
               --image-uri "${{ steps.ecr.outputs.registry }}/$REPO:${GITHUB_SHA::12}" >/dev/null
-            aws lambda wait function-updated --function-name "$FUNCTION"
-            echo "updated $FUNCTION"
+            # poll with GetFunction (the CI role has no GetFunctionConfiguration, which `aws lambda wait` needs)
+            for i in $(seq 1 30); do
+              st=$(aws lambda get-function --function-name "$FUNCTION" --query Configuration.LastUpdateStatus --output text)
+              [ "$st" = "Successful" ] && break
+              [ "$st" = "Failed" ] && { echo "update failed"; exit 1; }
+              sleep 4
+            done
+            echo "updated $FUNCTION ($st)"
           else
             echo "function not created yet (terraform deploy_chat=false)"
           fi
