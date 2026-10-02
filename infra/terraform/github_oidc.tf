@@ -18,7 +18,12 @@ data "aws_iam_policy_document" "pipeline_trust" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:*"]
+      # GitHub's "immutable subject" claim (owner@id/repo@id) is on for this repo,
+      # so the default repo:owner/name form no longer matches; allow both.
+      values = [
+        "repo:${var.github_repo}:*",
+        "repo:${var.github_repo_immutable}:*",
+      ]
     }
   }
 }

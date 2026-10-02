@@ -24,3 +24,9 @@ variable "alert_email" {
   type    = string
   default = "uttkarsh25tyagi@gmail.com"
 }
+
+variable "github_repo_immutable" {
+  description = "Immutable-subject form of the repo (owner@ownerId/repo@repoId)."
+  type        = string
+  default     = "tyxgx@175643418/streampulse@1339322726"
+}

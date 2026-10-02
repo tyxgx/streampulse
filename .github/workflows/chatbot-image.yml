@@ -1,0 +1,47 @@
+name: chatbot-image
+
+# Builds the chat Lambda container (arm64, on a native ARM runner) and pushes it to ECR.
+# If the Lambda already exists it is rolled forward to the new image.
+on:
+  push:
+    branches: [main]
+    paths: ["chatbot/**", "!chatbot/eval/**", "!chatbot/tests/**", ".github/workflows/chatbot-image.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  REPO: streampulse-chat
+  FUNCTION: streampulse-chat
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::922120357133:role/streampulse-github-pipeline
+          aws-region: ${{ env.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push
+        run: |
+          IMG="${{ steps.ecr.outputs.registry }}/$REPO"
+          docker build --provenance=false -f chatbot/Dockerfile -t "$IMG:${GITHUB_SHA::12}" -t "$IMG:latest" .
+          docker push "$IMG:${GITHUB_SHA::12}"
+          docker push "$IMG:latest"
+      - name: Roll the function forward (if it exists)
+        run: |
+          if aws lambda get-function --function-name "$FUNCTION" >/dev/null 2>&1; then
+            aws lambda update-function-code --function-name "$FUNCTION" \
+              --image-uri "${{ steps.ecr.outputs.registry }}/$REPO:${GITHUB_SHA::12}" >/dev/null
+            aws lambda wait function-updated --function-name "$FUNCTION"
+            echo "updated $FUNCTION"
+          else
+            echo "function not created yet (terraform deploy_chat=false)"
+          fi

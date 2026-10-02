@@ -93,12 +93,16 @@ jobs:
         run: |
           if grep -q '"status": "up_to_date"' run_summary.json; then echo "nothing new"; exit 0; fi
           aws s3 sync "s3://$LAKE_BUCKET/silver" lake/silver --only-show-errors
-          python pipeline/build_site_data.py --lake lake --out site_data --memory-limit 5GB
+          python pipeline/build_site_data.py --lake lake --out site_data --chat-out chat_data --memory-limit 5GB
           echo "SITE_DATA_BUILT=1" >> "$GITHUB_ENV"
 
       - name: Publish dashboard to S3
         if: env.SITE_DATA_BUILT == '1'
         run: |
+          # chatbot tables first, version marker last so the Lambda never sees a half-written set
+          aws s3 sync chat_data "s3://$LAKE_BUCKET/chat" --delete --exclude "_version.json" --only-show-errors
+          python -c "import json,datetime;json.dump({'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},open('chat_data/_version.json','w'))"
+          aws s3 cp chat_data/_version.json "s3://$LAKE_BUCKET/chat/_version.json" --only-show-errors
           aws s3 sync site_data "s3://$SITE_BUCKET/data" --delete --only-show-errors \
             --cache-control "public, max-age=300" --content-type application/json
           aws s3 sync dashboard "s3://$SITE_BUCKET" --only-show-errors --cache-control "public, max-age=300" \

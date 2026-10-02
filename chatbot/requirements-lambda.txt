@@ -2,5 +2,3 @@ duckdb==1.5.5
 langgraph
 openai
 rapidfuzz
-pytest
-boto3
