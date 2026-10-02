@@ -41,9 +41,9 @@ All tools return `{ok, as_of, data, notes, links}` or `{ok: false, error, sugges
 
 | Tool | Answers | Notes |
 |---|---|---|
-| `data_status` | how fresh is the data, which markets stopped | lists markets with no data for 3+ days |
+| `data_status` | how fresh is the data, which markets have no recent stream counts | lists markets with no data for 3+ days |
 | `global_overview` | worldwide streams in a period, change vs previous period | |
-| `country_stats` | one country: streams, share of all markets, change, latest chart date | warns when a market's chart stopped |
+| `country_stats` | one country: streams, share of all markets, change, latest chart date | warns when a market has no recent stream counts |
 | `top_tracks` | most-streamed tracks, global or one country | country windows capped at 60 days, global at ~210; falls back to all time with a note |
 | `top_artists` | most-streamed artists, global or one country | collaborations count for every credited artist |
 | `artist_summary` | rank, totals, best rank, top tracks, top markets, last 30 days | |
@@ -91,13 +91,15 @@ Parquet**, not from the chatbot's own tables, so the test cannot agree with itse
 
 - every expected figure appears in the answer within tolerance (ranks exactly);
 - the right tool was called successfully;
-- required or forbidden text (for example, the stale-market date for India);
+- required or forbidden text (for example, the last stream-count date for India);
 - for refusal cases: no figures, an admission or refusal, and no key-like strings.
 
 Categories: country (8), global (2), top lists (4), artist (3), track (4), compare (1), trend (2), data quirks (3), refusals and attacks (11).
 
-Latest run (2026-10-02, data as of 2026-09-30): **38 of 38 passed**, 100 % of answers verified, average 1.7 s, p95 3.5 s, about 2,100
-input tokens per question. Results are in `chatbot/eval/results/latest.md` and `latest.json`.
+Questions the providers could not answer because every model was rate limited are reported separately as **unavailable**; they count against availability, not
+accuracy. Latest full run with no unavailable questions (2026-10-02, data as of 2026-09-30): **38 of 38 passed**, 100 % of answers verified, average 1.7 s, p95 3.5 s,
+about 2,100 input tokens per question. A later run during the Bronze rebuild had 2 unavailable questions and 36 of 36 answered cases correct. Results are in
+`chatbot/eval/results/latest.md` and `latest.json`.
 
 How the number got there, honestly:
 

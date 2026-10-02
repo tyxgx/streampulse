@@ -186,7 +186,7 @@ pages.map = async () => {
     shapes.attr("fill", (f) => color(byName.get(f.properties.name)));
     dots.attr("fill", (c) => color(c));
     const stale = cs.filter((c) => c.last30 == null).map((c) => c.country_name);
-    document.getElementById("note").textContent = stale.length ? ` Grey = no data in the last 30 days (${stale.join(", ")}) or not on Spotify charts.` : "";
+    document.getElementById("note").textContent = stale.length ? ` Grey = no stream counts in the last 30 days (${stale.join(", ")}) or not on Spotify charts.` : "";
   };
   paint();
   document.getElementById("seg").addEventListener("click", (e) => {
@@ -330,7 +330,7 @@ pages.health = async () => {
     <div class="grid g2">
       <div class="card"><h2>Checks <span class="tag ${h.all_ok ? "ok" : "bad"}">${h.all_ok ? "all passing" : "attention"}</span></h2>
         <table><tbody>${h.checks.map((c) => `<tr><td>${esc(c.name)}</td><td><span class="tag ${c.ok ? "ok" : "bad"}">${c.ok ? "pass" : "fail"}</span></td><td class="muted">${esc(c.detail)}</td></tr>`).join("")}</tbody></table></div>
-      <div class="card"><h2>Markets with no recent data</h2>${h.stale_markets.length ? `<table><tbody>${h.stale_markets.map((m) => `<tr><td>${esc(m.country_name)}</td><td class="muted">last chart ${esc(String(m.last_date).slice(0, 10))}</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13px">These charts stopped in the source data, not in the pipeline.</p>` : '<p class="muted">None</p>'}</div>
+      <div class="card"><h2>Markets without recent stream counts</h2>${h.stale_markets.length ? `<table><tbody>${h.stale_markets.map((m) => `<tr><td>${esc(m.country_name)}</td><td class="muted">last stream data ${esc(String(m.last_date).slice(0, 10))}</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13px">The source file has no stream counts for these markets after the dates shown. That comes from the source data, not from the pipeline.</p>` : '<p class="muted">None</p>'}</div>
       <div class="card" style="grid-column:1/-1"><h2>Chart rows per day, last 45 days</h2><div class="chart"><canvas id="c1"></canvas></div></div>
     </div>`);
   barChart("c1", h.per_day.map((d) => String(d.date).slice(5, 10)), h.per_day.map((d) => d.chart_rows), { tooltip: { callbacks: { label: (c) => `${num(c.parsed.y)} rows` } } });

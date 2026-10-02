@@ -69,34 +69,41 @@ def main():
     out, by_cat = [], defaultdict(lambda: [0, 0])
     for i, case in enumerate(gold["cases"][: a.limit]):
         res = bot.ask(case["question"])
-        ok, checks = score(case, res)
-        by_cat[case["category"]][0] += ok
-        by_cat[case["category"]][1] += 1
-        out.append({"id": case["id"], "category": case["category"], "question": case["question"], "pass": ok, "checks": checks,
+        busy = res["answer"].startswith("The assistant is busy")   # provider rate limits: availability, not accuracy
+        ok, checks = (False, {"unavailable": True}) if busy else score(case, res)
+        if not busy:
+            by_cat[case["category"]][0] += ok
+            by_cat[case["category"]][1] += 1
+        out.append({"id": case["id"], "category": case["category"], "question": case["question"], "pass": ok, "unavailable": busy, "checks": checks,
                     "answer": res["answer"], "tools": [t["name"] for t in res["tools"]], "verified": res["verified"],
                     "model": res["model"], "ms": res["ms"], "tokens": res["tokens"]})
-        print(f"[{'PASS' if ok else 'FAIL'}] {case['id']:<34} {res['ms']:>5}ms {res['model']:<26} {'' if ok else checks}", flush=True)
+        print(f"[{'BUSY' if busy else 'PASS' if ok else 'FAIL'}] {case['id']:<34} {res['ms']:>5}ms {res['model']:<26} {'' if ok else checks}", flush=True)
         time.sleep(a.pause)
-    n = len(out)
-    passed = sum(o["pass"] for o in out)
-    summary = {"as_of": gold["as_of"], "cases": n, "passed": passed, "pass_rate": round(100 * passed / n, 1),
+    total = len(out)
+    unavailable = sum(o["unavailable"] for o in out)
+    answered = [o for o in out if not o["unavailable"]]
+    n = len(answered)
+    passed = sum(o["pass"] for o in answered)
+    summary = {"as_of": gold["as_of"], "cases": total, "answered": n, "unavailable": unavailable,
+               "passed": passed, "pass_rate": round(100 * passed / n, 1) if n else 0.0,
                "by_category": {k: {"passed": v[0], "total": v[1]} for k, v in by_cat.items()},
-               "verified_rate": round(100 * sum(1 for o in out if o["verified"]) / n, 1),
-               "avg_ms": round(sum(o["ms"] for o in out) / n),
-               "p95_ms": sorted(o["ms"] for o in out)[int(0.95 * (n - 1))],
-               "avg_tokens_in": round(sum(o["tokens"]["in"] for o in out) / n),
+               "verified_rate": round(100 * sum(1 for o in answered if o["verified"]) / n, 1) if n else 0.0,
+               "avg_ms": round(sum(o["ms"] for o in answered) / n) if n else 0,
+               "p95_ms": sorted(o["ms"] for o in answered)[int(0.95 * (n - 1))] if n else 0,
+               "avg_tokens_in": round(sum(o["tokens"]["in"] for o in answered) / n) if n else 0,
                "run_at": time.strftime("%Y-%m-%d %H:%M:%S")}
     (HERE / "results").mkdir(exist_ok=True)
     json.dump({"summary": summary, "cases": out}, open(HERE / "results" / "latest.json", "w"), indent=1, ensure_ascii=False)
-    md = [f"# Chatbot eval ({summary['run_at']})", "", f"Data as of {summary['as_of']}. **{passed}/{n} passed ({summary['pass_rate']}%)**.", "",
+    md = [f"# Chatbot eval ({summary['run_at']})", "", f"Data as of {summary['as_of']}. **{passed}/{n} answered cases passed ({summary['pass_rate']}%)**; "
+          f"{unavailable} of {total} could not be answered because the model providers were rate limited.", "",
           "| Category | Passed |", "|---|---|"] + [f"| {k} | {v['passed']}/{v['total']} |" for k, v in summary["by_category"].items()] + \
          ["", f"Verified-answer rate {summary['verified_rate']}%, avg latency {summary['avg_ms']} ms, p95 {summary['p95_ms']} ms.", "", "## Failures", ""]
     for o in out:
-        if not o["pass"]:
+        if not o["pass"] and not o["unavailable"]:
             md.append(f"- **{o['id']}**: {o['question']}\n  - checks: {o['checks']}\n  - answer: {o['answer'][:300]}")
     (HERE / "results" / "latest.md").write_text("\n".join(md))
     print("\n" + json.dumps(summary, indent=1))
-    sys.exit(0 if summary["pass_rate"] >= 85 else 1)
+    sys.exit(0 if summary["pass_rate"] >= 85 and unavailable <= 0.2 * total else 1)
 
 
 if __name__ == "__main__":

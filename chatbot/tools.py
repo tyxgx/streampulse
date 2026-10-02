@@ -183,7 +183,7 @@ class Facts:
         last_date = self.q("SELECT max(date)::VARCHAR AS d FROM daily_country WHERE market = ?", m)[0]["d"]
         notes = []
         if last_date < str(self.as_of - __import__("datetime").timedelta(days=3)):
-            notes.append(f"{name} has no chart data after {last_date}; the source chart stopped.")
+            notes.append(f"{name} has no stream counts after {last_date} in the source data.")
         total = self.q("SELECT sum(streams)::BIGINT AS s FROM daily_country WHERE market = ?", m)[0]["s"]
         data = {"country": name, "latest_chart_date": last_date, "all_time_streams": total,
                 "all_time_streams_human": human(total)}
@@ -422,7 +422,7 @@ class Facts:
 # ---- tool registry for the LLM (OpenAI-style function schemas) ----
 _PERIOD = {"type": "string", "enum": sorted(PERIODS), "description": "Time window. Defaults to last_30_days."}
 TOOL_SPECS = [
-    {"name": "data_status", "description": "Freshness of the data and markets whose charts stopped updating.", "parameters": {"type": "object", "properties": {}}},
+    {"name": "data_status", "description": "Freshness of the data and markets with no recent stream counts in the source.", "parameters": {"type": "object", "properties": {}}},
     {"name": "global_overview", "description": "Total charted streams across all markets, number of tracks/artists, and change vs the previous period.", "parameters": {"type": "object", "properties": {"period": _PERIOD}}},
     {"name": "country_stats", "description": "Streams for one country in a period, its share of all markets, change vs previous period, and data freshness.", "parameters": {"type": "object", "properties": {"country": {"type": "string"}, "period": _PERIOD}, "required": ["country"]}},
     {"name": "top_tracks", "description": "Most-streamed tracks, globally or in one country. Country windows are limited to 60 days.", "parameters": {"type": "object", "properties": {"period": _PERIOD, "country": {"type": "string", "description": "Optional. Omit for global."}, "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT}}}},

@@ -2,6 +2,25 @@
 
 Short records of why things are the way they are. Newest first.
 
+## 2026-10 Bronze, Silver, Gold with an append-only Bronze, and Silver rebuilt from Bronze
+**Context.** The first serverless version kept Silver and Gold but threw the raw CSV away after every run, so there was no raw layer and no way to replay
+cleaning rules, and Gold was built but nothing read it. **Decision.** Persist Bronze (the Kaggle rows as parsed, immutable, with lineage columns), make Silver a pure
+function of Bronze, and serve monthly views from Gold. **Why.** Kaggle only serves its latest file, so the raw history would otherwise be unrecoverable; with
+Bronze any change to the cleaning rules can be applied to the whole history with `--rebuild-silver`. **How Bronze stays small.** Each run appends only rows that are new or
+changed, found by comparing a hash of the whole row with what Bronze already holds over a 7-day lookback; an unchanged day appends nothing. **Costs and limits.**
+About 1.3 GB more storage; corrections older than the lookback are not seen; the CSV is read with `ignore_errors=true`, so a malformed line is skipped before
+it reaches Bronze (Bronze is "raw as parsed", not byte-for-byte); column types are inferred from a sample, as before. **Alternative rejected:** storing every column as text
+(truest raw, but every later step then needs casts and the files are larger).
+
+## 2026-10 Gold serves the monthly views, and a reconciliation check guards it
+Gold was already being computed but nothing used it. The overview chart, per-country monthly series and label shares now come from Gold; daily and track-level views
+stay on Silver. Before switching, Gold and Silver were compared: 117 months and 7,662 country-months differed by 0. The build now repeats that comparison on every run
+and publishes it on the Data health page, so a bad Gold write cannot reach the dashboard unnoticed.
+
+## 2026-10 Deterministic names in the serving layer
+About 420 tracks carry more than one artist spelling over time. `any_value()` picked an arbitrary one, so artist counts changed between runs (59,576, then 59,572 on the same data).
+The serving layer now takes the most recent spelling with a value tie-break; two builds on the same data are byte-identical, and a unit test covers it.
+
 ## 2026-10 Tools plus a verifier, not retrieval, for the assistant
 **Context.** Questions are analytical; answers are numbers. **Decision.** Ten deterministic tools, a tool-calling agent, and a verifier that rejects
 any figure absent from tool output. **Why.** Similarity search cannot guarantee the right number, and free-text SQL generation cannot guarantee a safe or

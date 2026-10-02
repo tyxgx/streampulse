@@ -62,4 +62,4 @@ def test_tools_known_values_and_errors():
 def test_stale_market_is_flagged():
     from tools import Facts, call_tool
     r = call_tool(Facts(DATA), "country_stats", {"country": "India"})
-    assert any("no chart data after" in n for n in r["notes"])
+    assert any("no stream counts after" in n for n in r["notes"])

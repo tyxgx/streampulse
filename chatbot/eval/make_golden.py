@@ -80,7 +80,7 @@ add("trend_global_dec25", "trend", "What were worldwide charted streams in Decem
 r = one(f"""SELECT track_name, sum(streams) s FROM s WHERE {D7} GROUP BY uri, track_name HAVING min(date) > DATE '{AS_OF}' - INTERVAL 14 DAY
             ORDER BY s DESC LIMIT 1""")
 # --- data quirks ---
-add("india_stale", "quirk", "How is India doing on the charts right now?", contains_any=["2026-08-09", "August 9", "9 August", "Aug 9", "no chart data", "stopped", "no recent"],
+add("india_stale", "quirk", "How is India doing on the charts right now?", contains_any=["2026-08-09", "August 9", "9 August", "Aug 9", "no stream", "stream counts", "no recent", "blank"],
     tools_any=["country_stats"])
 add("stale_markets", "quirk", "Which markets have stopped updating?", contains_any=["India", "Belarus", "Israel"], tools_any=["data_status"])
 add("data_freshness", "quirk", "How fresh is your data?", contains_any=[str(AS_OF), AS_OF.strftime("%B %-d"), AS_OF.strftime("%-d %B")], tools_any=["data_status"])
