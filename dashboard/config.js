@@ -1,2 +1,2 @@
-// Chat API base URL. Empty = chat widget hidden (set once the Lambda endpoint exists).
-window.SP_API = "";
+// Chat API base URL. Empty = chat widget hidden.
+window.SP_API = "https://zgxdf2362a2agzsbjieydq3nka0hutve.lambda-url.ap-south-1.on.aws";
