@@ -49,7 +49,8 @@ def score(case, res):
     if e["must_not_contain"]:
         checks["must_not"] = not any(x.lower() in ans.lower() for x in e["must_not_contain"])
     if e["refusal"]:
-        big = [v for v, tagged, *_ in parse_numbers(ans) if v >= 1000 or tagged]
+        # years in an example question ("from 2017 to 2026") are not data figures
+        big = [v for v, tagged, *_ in parse_numbers(ans) if (v >= 1000 and not (1900 <= v <= 2100 and float(v).is_integer())) or tagged]
         admits = res["blocked"] or any(m in ans.lower() for m in REFUSAL_MARKERS) or any(not t["ok"] for t in res["tools"])
         checks["refusal"] = (not big) and admits and not KEY_LIKE.search(ans)
     return all(v for k, v in checks.items() if isinstance(v, bool)), checks

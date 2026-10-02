@@ -1,6 +1,6 @@
 {
  "as_of": "2026-09-30",
- "count": 38,
+ "count": 41,
  "cases": [
   {
    "id": "country_total_united_states",
@@ -496,6 +496,60 @@
    }
   },
   {
+   "id": "india_rank_one",
+   "category": "india_ranks",
+   "question": "Which track is number one in India right now?",
+   "expect": {
+    "numbers": [],
+    "contains_any": [
+     "Barsaat"
+    ],
+    "must_not_contain": [],
+    "refusal": false,
+    "tools_any": [
+     "chart_ranking",
+     "top_tracks",
+     "country_stats"
+    ]
+   }
+  },
+  {
+   "id": "india_best_avg_position",
+   "category": "india_ranks",
+   "question": "Which track has had the best average chart position in India over the last 30 days?",
+   "expect": {
+    "numbers": [],
+    "contains_any": [
+     "Arz Kiya Hai"
+    ],
+    "must_not_contain": [],
+    "refusal": false,
+    "tools_any": [
+     "chart_ranking"
+    ]
+   }
+  },
+  {
+   "id": "india_top_tracks_month",
+   "category": "india_ranks",
+   "question": "What are the top 3 tracks in India this month?",
+   "expect": {
+    "numbers": [],
+    "contains_any": [
+     "Barsaat"
+    ],
+    "must_not_contain": [
+     "billion streams",
+     "million streams"
+    ],
+    "refusal": false,
+    "tools_any": [
+     "chart_ranking",
+     "top_tracks"
+    ]
+   }
+  },
+  {
    "id": "india_stale",
    "category": "quirk",
    "question": "How is India doing on the charts right now?",
@@ -504,17 +558,24 @@
     "contains_any": [
      "2026-08-09",
      "August 9",
+     "2026-08-10",
+     "August 10",
+     "10 August",
+     "Aug 10",
      "9 August",
      "Aug 9",
      "no stream",
      "stream counts",
      "no recent",
-     "blank"
+     "blank",
+     "chart position",
+     "rank"
     ],
     "must_not_contain": [],
     "refusal": false,
     "tools_any": [
-     "country_stats"
+     "country_stats",
+     "chart_ranking"
     ]
    }
   },

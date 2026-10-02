@@ -1,10 +1,10 @@
 {
  "summary": {
   "as_of": "2026-09-30",
-  "cases": 38,
-  "answered": 38,
+  "cases": 41,
+  "answered": 41,
   "unavailable": 0,
-  "passed": 38,
+  "passed": 41,
   "pass_rate": 100.0,
   "by_category": {
    "country": {
@@ -35,6 +35,10 @@
     "passed": 2,
     "total": 2
    },
+   "india_ranks": {
+    "passed": 3,
+    "total": 3
+   },
    "quirk": {
     "passed": 3,
     "total": 3
@@ -45,10 +49,10 @@
    }
   },
   "verified_rate": 100.0,
-  "avg_ms": 1522,
-  "p95_ms": 2748,
-  "avg_tokens_in": 2158,
-  "run_at": "2026-10-02 21:29:05"
+  "avg_ms": 2529,
+  "p95_ms": 4922,
+  "avg_tokens_in": 2903,
+  "run_at": "2026-10-02 22:56:10"
  },
  "cases": [
   {
@@ -61,16 +65,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "The United States has had **313.03 B** total charted streams all time (data runs to 2026-09-30).",
+   "answer": "The US has had 313.03B total charted streams all time (data runs to 2026-09-30).",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1538,
+   "model": "groq:qwen/qwen3.8-27b",
+   "ms": 3203,
    "tokens": {
-    "in": 2407,
-    "out": 119
+    "in": 4360,
+    "out": 75
    }
   },
   {
@@ -83,16 +87,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Brazil has had 157.96 billion charted streams all time (data runs to 2026-09-30).",
+   "answer": "Brazil has had 157.96 B charted streams all time (data runs to 2026-09-30).",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2678,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1881,
    "tokens": {
-    "in": 2404,
-    "out": 113
+    "in": 2914,
+    "out": 121
    }
   },
   {
@@ -105,16 +109,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Japan has had 39.99 billion charted streams all time (data runs to 2026-09-30).",
+   "answer": "Japan has had 39.99 B charted streams all time, with the latest chart date of 2026-09-30.",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1442,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1707,
    "tokens": {
-    "in": 2404,
-    "out": 117
+    "in": 2914,
+    "out": 122
    }
   },
   {
@@ -127,16 +131,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Germany has had **83.10 billion** charted streams all time (data runs to 2026-09-30).",
+   "answer": "Germany has had 83.10 B charted streams all time, with the latest chart date of 2026-09-30.",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1022,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1366,
    "tokens": {
-    "in": 2404,
-    "out": 119
+    "in": 2914,
+    "out": 122
    }
   },
   {
@@ -149,16 +153,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Mexico has had 166.38 billion charted streams all time (data runs to 2026-09-30).",
+   "answer": "Mexico has had 166.38 B charted streams all time, with the latest chart date of 2026-09-30.",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1251,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 2312,
    "tokens": {
-    "in": 2404,
-    "out": 120
+    "in": 3615,
+    "out": 111
    }
   },
   {
@@ -171,16 +175,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "United Kingdom’s charted streams in the last 30 days were **635.3 million** (635,254,935) streams, based on data up to 2026-09-30.",
+   "answer": "In the last 30 days (up to 2026-09-30), the United Kingdom had 635.3M charted streams, which represents 3.1% of all markets. This figure is a 1.6% decrease compared to the previous period.",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1231,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3867,
    "tokens": {
-    "in": 2457,
-    "out": 160
+    "in": 3935,
+    "out": 91
    }
   },
   {
@@ -193,16 +197,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Brazil recorded **1.69 billion charted streams** in the last 30 days (data runs through 2026-09-30).",
+   "answer": "Brazil’s charted streams in the last 30 days were 1.69 B (1,693,155,908 streams), a 0.1 % increase from the previous period. This represents 8.3 % of all markets’ streams. The data is current through 2026-09-30.",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1435,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1215,
    "tokens": {
-    "in": 2453,
-    "out": 144
+    "in": 2964,
+    "out": 128
    }
   },
   {
@@ -215,16 +219,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Japan recorded **538,053,479 charted streams** in the last 30 days (data through 2026-09-30).",
+   "answer": "Japan’s charted streams in the last 30 days were 538,053,479 streams (538.1 M).",
    "tools": [
     "country_stats"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2099,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1476,
    "tokens": {
-    "in": 2453,
-    "out": 153
+    "in": 2964,
+    "out": 116
    }
   },
   {
@@ -237,16 +241,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Worldwide, there were **20.48 B** charted streams in the last 30 days (data runs to 2026-09-30).",
+   "answer": "There were 20.48 billion charted streams worldwide in the last 30 days, based on data running up to 2026-09-30.",
    "tools": [
     "global_overview"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1843,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2719,
    "tokens": {
-    "in": 2453,
-    "out": 92
+    "in": 3909,
+    "out": 59
    }
   },
   {
@@ -259,16 +263,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "The total charted streams ever recorded across all markets is **1.98 trillion** (1,975,827,283,877 streams). The data runs up to 2026-09-30.",
+   "answer": "The total of all charted streams recorded across 72 markets from 2017 to 2026-09-30 is 1.98 trillion.",
    "tools": [
     "global_overview"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2212,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2379,
    "tokens": {
-    "in": 2433,
-    "out": 98
+    "in": 3423,
+    "out": 84
    }
   },
   {
@@ -282,16 +286,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "The most-streamed track worldwide in the last 7 days is **“Patient Zero” by Taylor Swift**, with **39.6 million** charted streams (data runs to 2026-09-30).",
+   "answer": "The most streamed track globally in the last 7 days is \"Patient Zero\" by Taylor Swift, with 39.6M streams. This data runs to 2026-09-30.",
    "tools": [
     "top_tracks"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1878,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3084,
    "tokens": {
-    "in": 2417,
-    "out": 169
+    "in": 3844,
+    "out": 69
    }
   },
   {
@@ -305,16 +309,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "The number-one song in Brazil over the last 30 days is **“Postinho de Gasolina”** by João Gustavo e Murilo & Grelo, with **28.7 million streams**. (Data runs to 2026-09-30.)",
+   "answer": "The number one song in Brazil over the last 30 days is \"Postinho de Gasolina\" by João Gustavo e Murilo and Grelo, with 28,713,851 streams. This data runs to 2026-09-30.",
    "tools": [
     "top_tracks"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1840,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2236,
    "tokens": {
-    "in": 2441,
-    "out": 180
+    "in": 3413,
+    "out": 137
    }
   },
   {
@@ -328,16 +332,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "The most-streamed track of all time is **“BIRDS OF A FEATHER” by Billie Eilish** with **3.42 billion** charted streams (data runs to 2026-09-30).",
+   "answer": "The most streamed track of all time is \"BIRDS OF A FEATHER\" by Billie Eilish, with 3.42 billion charted streams. This data runs to 2026-09-30.",
    "tools": [
     "top_tracks"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1884,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3438,
    "tokens": {
-    "in": 2413,
-    "out": 174
+    "in": 3990,
+    "out": 65
    }
   },
   {
@@ -351,16 +355,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "Bad Bunny is the most-streamed artist worldwide in the last 30 days, with 299.4 million charted streams (data runs to 2026-09-30).",
+   "answer": "The most streamed artist worldwide in the last 30 days is **Bad Bunny** with 299.4 M streams.",
    "tools": [
     "top_artists"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1583,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 2092,
    "tokens": {
-    "in": 2423,
-    "out": 181
+    "in": 2925,
+    "out": 109
    }
   },
   {
@@ -373,16 +377,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Bad Bunny has **54.27 billion** total charted streams (all-time, data runs to 2026-09-30).",
+   "answer": "Bad Bunny’s total charted streams are **54.27 B** (54,271,794,714).  \nThis figure includes all streams from tracks where he is credited, including collaborations.  \nThe data is current through 2026-09-30.",
    "tools": [
     "artist_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2748,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 2837,
    "tokens": {
-    "in": 2656,
-    "out": 79
+    "in": 3154,
+    "out": 229
    }
   },
   {
@@ -395,16 +399,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Taylor Swift has **23.11 billion** total charted streams (all-time), with data current through 2026-09-30.",
+   "answer": "Taylor Swift’s total charted streams are 23.11 B (23,109,817,548) as of 2026-09-30.",
    "tools": [
     "artist_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2227,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 2224,
    "tokens": {
-    "in": 2658,
-    "out": 131
+    "in": 3156,
+    "out": 132
    }
   },
   {
@@ -417,16 +421,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Drake has **24.64 B** total charted streams (all-time) on the StreamPulse data, which runs through 2026-09-30.",
+   "answer": "Drake has 24.64 billion total charted streams as of 2026-09-30. Please note that collaborations count towards every credited artist.",
    "tools": [
     "artist_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1280,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 4052,
    "tokens": {
-    "in": 2654,
-    "out": 81
+    "in": 4136,
+    "out": 52
    }
   },
   {
@@ -439,16 +443,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "\"BIRDS OF A FEATHER\" by Billie Eilish has **3.42 billion** all-time charted streams (up to 2026-09-30).",
+   "answer": "\"BIRDS OF A FEATHER\" by Billie Eilish has accumulated 3.42 billion charted streams as of 2026-09-30. In the last 30 days, it has received 31.6 million streams.",
    "tools": [
     "track_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1563,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 5115,
    "tokens": {
-    "in": 2597,
-    "out": 110
+    "in": 3600,
+    "out": 118
    }
   },
   {
@@ -461,16 +465,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "The best chart position for “BIRDS OF A FEATHER” by Billie Eilish was **#1**.",
+   "answer": "The best chart position of \"BIRDS OF A FEATHER\" by Billie Eilish is 1. This data runs to 2026-09-30.",
    "tools": [
     "track_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1217,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2725,
    "tokens": {
-    "in": 2595,
-    "out": 98
+    "in": 3598,
+    "out": 123
    }
   },
   {
@@ -483,16 +487,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Blinding Lights by The Weeknd has **3.62 billion** charted streams (all-time). The data runs to 2026-09-30.",
+   "answer": "Blinding Lights by The Weeknd has charted for 3,622,177,109 streams (all-time, up to 2026-09-30).",
    "tools": [
     "track_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1658,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 3394,
    "tokens": {
-    "in": 2608,
-    "out": 102
+    "in": 3106,
+    "out": 144
    }
   },
   {
@@ -505,16 +509,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Blinding Lights by The Weeknd reached a best chart rank of **1**.",
+   "answer": "The best chart position for \"Blinding Lights\" by The Weeknd is 1. This data is based on charts up to 2026-09-30.",
    "tools": [
     "track_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1077,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3235,
    "tokens": {
-    "in": 2606,
-    "out": 83
+    "in": 3614,
+    "out": 131
    }
   },
   {
@@ -527,16 +531,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "In the last 30 days (through 2026-09-30), the United Kingdom logged 635.3 million charted streams (3.1 % of all markets) and saw a -1.6 % change versus the prior period, while Germany recorded 553.4 million streams (2.7 % of all markets) with a +0.2 % change. The UK’s streams were about 1.15 times Germany’s.",
+   "answer": "In the last 30 days (through 2026-09-30), the United Kingdom recorded 635.3M charted streams, representing a 3.1% share of all markets and a 1.6% decrease compared to the previous period. Germany recorded 553.4M charted streams, representing a 2.7% share and a 0.2% increase. The ratio of streams between the United Kingdom and Germany is 1.15.",
    "tools": [
     "compare_countries"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 4051,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3773,
    "tokens": {
-    "in": 2562,
-    "out": 242
+    "in": 4100,
+    "out": 144
    }
   },
   {
@@ -549,16 +553,16 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Japan had 564.3M charted streams in August 2026.",
+   "answer": "Japan had 564,291,418 charted streams in August 2026 (564.3 M). The data runs to 2026-09-30.",
    "tools": [
     "monthly_trend"
    ],
    "verified": true,
-   "model": "groq:qwen/qwen3.8-27b",
-   "ms": 1291,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1372,
    "tokens": {
-    "in": 3750,
-    "out": 96
+    "in": 2939,
+    "out": 225
    }
   },
   {
@@ -571,16 +575,83 @@
     "numbers": true,
     "tool": true
    },
-   "answer": "Worldwide charted streams in December 2025 were 27.82B (27,817,564,715).",
+   "answer": "Worldwide charted streams in December 2025 were 27.82 billion. Please note that the data runs to 2026-09-30.",
    "tools": [
     "monthly_trend"
    ],
    "verified": true,
-   "model": "groq:qwen/qwen3.8-27b",
-   "ms": 3024,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2148,
    "tokens": {
-    "in": 3737,
-    "out": 101
+    "in": 3420,
+    "out": 126
+   }
+  },
+  {
+   "id": "india_rank_one",
+   "category": "india_ranks",
+   "question": "Which track is number one in India right now?",
+   "pass": true,
+   "unavailable": false,
+   "checks": {
+    "tool": true,
+    "contains": true
+   },
+   "answer": "The track currently ranked number 1 in India is **“Barsaat” by Banjaare, Roni**.  \nThese are chart positions (not stream counts); India has no stream counts published after 2026-08-10. The data is current through 2026-09-30.",
+   "tools": [
+    "chart_ranking"
+   ],
+   "verified": true,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 10781,
+   "tokens": {
+    "in": 3551,
+    "out": 219
+   }
+  },
+  {
+   "id": "india_best_avg_position",
+   "category": "india_ranks",
+   "question": "Which track has had the best average chart position in India over the last 30 days?",
+   "pass": true,
+   "unavailable": false,
+   "checks": {
+    "tool": true,
+    "contains": true
+   },
+   "answer": "The track with the best average chart position in India over the last 30 days is **“Arz Kiya Hai | Coke Studio Bharat”** by Anuv Jain.  \nIts average rank is 1.4, and it spent 30 days in the top 10.  \n(Note: these are chart positions, not stream counts.)",
+   "tools": [
+    "chart_ranking"
+   ],
+   "verified": true,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1168,
+   "tokens": {
+    "in": 3112,
+    "out": 234
+   }
+  },
+  {
+   "id": "india_top_tracks_month",
+   "category": "india_ranks",
+   "question": "What are the top 3 tracks in India this month?",
+   "pass": true,
+   "unavailable": false,
+   "checks": {
+    "tool": true,
+    "contains": true,
+    "must_not": true
+   },
+   "answer": "The top 3 tracks in India over the last 30 days (through 2026-09-30) are:\n\n1. \"Arz Kiya Hai | Coke Studio Bharat\" by Anuv Jain\n2. \"Barsaat\" by Banjaare, Roni\n3. \"KALYANI (with Shreya Ghoshal) - Remix\" by ARJN, KDS, FIFTY4, Shreya Ghoshal\n\nThese are based on chart positions, not stream counts, as stream counts are not published for India after 2026-08-10.",
+   "tools": [
+    "chart_ranking"
+   ],
+   "verified": true,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 3813,
+   "tokens": {
+    "in": 3678,
+    "out": 401
    }
   },
   {
@@ -593,16 +664,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "India’s last charted data is from 2026-08-09, with a total of 95.02 B charted streams to date. No recent stream counts are available after that date. The data runs to 2026-09-30.",
+   "answer": "As of 2026-09-30, the top track in India is \"Barsaat\" by Banjaare and Roni. Please note that stream counts for India are not published after 2026-08-10, so these figures represent chart positions rather than stream counts.",
    "tools": [
-    "country_stats"
+    "chart_ranking"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-20b",
-   "ms": 1479,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 4922,
    "tokens": {
-    "in": 2432,
-    "out": 223
+    "in": 4204,
+    "out": 92
    }
   },
   {
@@ -615,16 +686,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "The markets that have not received recent updates are:\n\n- Belarus (last data 2026-03-24)  \n- Israel (last data 2026-03-25)  \n- India (last data 2026-08-09)",
+   "answer": "The markets that have stopped updating charted-stream data are:\n\n- Belarus - last stream date 2026-03-24  \n- Israel - last stream date 2026-03-25  \n- India - last stream date 2026-08-09 (chart positions are available through 2026-09-30, but no stream counts after that date)",
    "tools": [
     "data_status"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1743,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 2435,
    "tokens": {
-    "in": 2422,
-    "out": 149
+    "in": 2950,
+    "out": 212
    }
   },
   {
@@ -637,16 +708,16 @@
     "tool": true,
     "contains": true
    },
-   "answer": "The dataset covers daily Spotify top-200 charts from 2017-01-01 up to 2026-09-30 across 72 markets. Three markets haven’t had recent counts: Belarus (last data 2026-03-24), Israel (2026-03-25) and India (2026-08-09).",
+   "answer": "The StreamPulse data runs from 2017-01-01 to 2026-09-30. Please note that India has no stream counts after 2026-08-09, while Belarus and Israel have no stream counts after 2026-03-24 and 2026-03-25, respectively.",
    "tools": [
     "data_status"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1544,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 4332,
    "tokens": {
-    "in": 2422,
-    "out": 200
+    "in": 3912,
+    "out": 96
    }
   },
   {
@@ -658,14 +729,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about the StreamPulse Spotify chart data. For example: \"What are the top 5 tracks in India this month?\" or \"How do US and UK streams compare over the last 30 days?\"",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples:  \n- “What were the top 10 tracks in the US last 30 days?”  \n- “How many streams did Taylor Swift have in the UK last year?”",
    "tools": [],
    "verified": true,
-   "model": "groq:qwen/qwen3.8-27b",
-   "ms": 492,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 754,
    "tokens": {
-    "in": 1781,
-    "out": 47
+    "in": 1407,
+    "out": 96
    }
   },
   {
@@ -677,14 +748,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about the StreamPulse chart data. For example: “What were the top-streamed tracks worldwide last month?” or “How many streams did Taylor Swift have in the United States over the past 30 days?”",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples:  \n- “What were the top 10 tracks in the US last 30 days?”  \n- “How many streams did Taylor Swift have in the UK last year?”",
    "tools": [],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 549,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 573,
    "tokens": {
-    "in": 1161,
-    "out": 105
+    "in": 1410,
+    "out": 102
    }
   },
   {
@@ -696,14 +767,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about the StreamPulse Spotify chart data. For example: “What were the most-streamed tracks worldwide last month?” or “How many streams did Taylor Swift have in the United States in the past 30 days?”",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples:  \n- “Which artist had the most streams in the US last 30 days?”  \n- “What were the top 5 tracks in Germany on 2026-09-30?”",
    "tools": [],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 379,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 771,
    "tokens": {
-    "in": 1161,
-    "out": 91
+    "in": 1410,
+    "out": 88
    }
   },
   {
@@ -715,14 +786,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about StreamPulse chart data. For example: “What were Taylor Swift’s total charted streams worldwide in the last 30 days?” or “Which track was the most-streamed in Brazil last week?”",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples: “What were the top 10 tracks in the US last 30 days?” or “How many streams did Ed Sheeran have in Canada last month?”",
    "tools": [],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1961,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 685,
    "tokens": {
-    "in": 1162,
-    "out": 100
+    "in": 1411,
+    "out": 97
    }
   },
   {
@@ -734,14 +805,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about the StreamPulse chart data. For example: “What were Drake’s total charted streams worldwide in the last 30 days?” or “Which track was the most-streamed in Brazil last week?”",
+   "answer": "I only answer questions about the StreamPulse Spotify top-200 chart data. For example, you can ask me \"What are the top tracks by Drake globally?\" or \"How many streams did Drake have in the last 30 days?\"",
    "tools": [],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 716,
+   "model": "gemini:gemini-3.1-flash-lite",
+   "ms": 2622,
    "tokens": {
-    "in": 1161,
-    "out": 119
+    "in": 1869,
+    "out": 50
    }
   },
   {
@@ -753,14 +824,14 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I only answer questions about the StreamPulse chart data. For example: “What were Bad Bunny’s total streams worldwide in the last 30 days?” or “Which track was the most-streamed in Brazil last week?”",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples: “How many streams did Bad Bunny have in the last 30 days?” or “What are the top tracks in the US this month?”",
    "tools": [],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1079,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1187,
    "tokens": {
-    "in": 1163,
-    "out": 97
+    "in": 1412,
+    "out": 93
    }
   },
   {
@@ -776,7 +847,7 @@
    "tools": [],
    "verified": true,
    "model": "",
-   "ms": 6,
+   "ms": 4,
    "tokens": {
     "in": 0,
     "out": 0
@@ -795,7 +866,7 @@
    "tools": [],
    "verified": true,
    "model": "",
-   "ms": 15,
+   "ms": 1,
    "tokens": {
     "in": 0,
     "out": 0
@@ -810,16 +881,16 @@
    "checks": {
     "refusal": true
    },
-   "answer": "I’m sorry, but “Atlantis” isn’t a recognized market in the StreamPulse data. Try a real country such as Latvia, the United States, or Japan.",
+   "answer": "I only answer questions about the StreamPulse chart data.  \nExamples: “What are the top tracks in Germany?” or “How many streams did Taylor Swift have in the last 30 days?”",
    "tools": [
     "top_tracks"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 1754,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 3873,
    "tokens": {
-    "in": 2374,
-    "out": 175
+    "in": 2879,
+    "out": 250
    }
   },
   {
@@ -831,16 +902,16 @@
    "checks": {
     "refusal": true
    },
-   "answer": "The artist “Zzyzx Qwertyuiop” isn’t in the StreamPulse database, so no stream data is available. (You could try a different spelling or another artist.)",
+   "answer": "I couldn’t find a track named “Zzyzx Qwertyuiop.”  \nDid you mean one of these?  \n- “Pop” - Harry Styles  \n- “Vertigo” - Khalid  \n- “Up” - Cardi B",
    "tools": [
-    "artist_summary"
+    "track_summary"
    ],
    "verified": true,
-   "model": "groq:openai/gpt-oss-120b",
-   "ms": 2036,
+   "model": "groq:openai/gpt-oss-20b",
+   "ms": 1912,
    "tokens": {
-    "in": 2395,
-    "out": 133
+    "in": 2900,
+    "out": 236
    }
   },
   {
@@ -856,7 +927,7 @@
    "tools": [],
    "verified": true,
    "model": "",
-   "ms": 12,
+   "ms": 4,
    "tokens": {
     "in": 0,
     "out": 0

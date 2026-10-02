@@ -59,7 +59,8 @@ rebuilt Silver from it, and the result matched the previous Silver exactly: 43,8
 
 ### Source quirks the layers make visible
 - **India:** from 2026-08-10 the source still has 200 ranked rows a day, but `streams` is blank. Bronze and Silver keep those rows (10,400 of them);
-  every stream-based view uses rows with streams, so India shows as having no recent stream counts.
+  stream-based views use rows with streams, so India's stream totals stop at 2026-08-09, while the dashboard's India page and the assistant use chart positions
+  (`rank_country_day`) to show current standings.
 - **Belarus and Israel:** no rows at all after 2026-03-24 and 2026-03-25.
 - **Track names:** about 420 tracks carry more than one artist spelling over time (for example "DANNA" and "Danna Paola"). The serving layer takes the most
   recent spelling, with a deterministic tie-break, so results are identical on every run. (An earlier `any_value()` picked an arbitrary one and made artist
@@ -91,6 +92,7 @@ streampulse-site-922120357133        public read, S3 website hosting, CORS GET/H
 | `track_country` | track x market | per-market rankings, all time |
 | `track_country_day` | track x market x day, last 60 days | per-country recent windows |
 | `track_day` | track x day, last ~210 days | global recent windows, movers |
+| `rank_country_day` | track x market x day, last 60 days, with names, **not filtered on streams** | chart positions, used where stream counts are blank (India) |
 | `track_artist` | track x credited artist | artist rollups (collaborations count for every credited artist) |
 | `artist_all` | artist | all-time artist rank and totals |
 

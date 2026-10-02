@@ -204,19 +204,31 @@ pages.countries = async () => {
     { h: "Last 30 days", k: "last30", num: true, html: (c) => fmt(c.last30) },
     { h: "30-day change", k: "mom_pct", num: true, html: (c) => pct(c.mom_pct) },
     { h: "All time", k: "total", num: true, html: (c) => fmt(c.total) },
-    { h: "Latest data", k: "last_date", num: true, html: (c) => `${esc(String(c.last_date).slice(0, 10))}${c.last30 == null ? ' <span class="tag warn">stale</span>' : ""}` },
+    { h: "Latest data", k: "last_date", num: true, html: (c) => `${esc(String(c.last_date).slice(0, 10))}${c.last30 == null ? (c.streams_missing ? ' <span class="tag warn">ranks only</span>' : ' <span class="tag warn">stale</span>') : ""}` },
   ], cs, { sort: "last30", search: "Search countries", text: (c) => c.country_name, limit: 100 }));
 };
 
 pages.country = async (m) => {
   const c = await load(`country/${m}.json`);
   const last = c.monthly[c.monthly.length - 1];
+  const d10 = (x) => esc(String(x).slice(0, 10));
+  const sub = c.streams_missing
+    ? `Stream counts through ${d10(c.last_date)}. Chart positions through ${d10(c.rank_through)}.`
+    : c.last30 == null ? `<span class="tag warn">No data since ${d10(c.last_date)}</span>` : `Latest chart day ${d10(c.last_date)}.`;
+  const notice = c.streams_missing
+    ? `<div class="card notice"><b>Stream counts are not published for ${esc(c.country_name)} after ${d10(c.last_date)}.</b> The chart itself continues, so the lists below use chart positions, which run through ${d10(c.rank_through)}.</div>` : "";
+  const ranked = (items) => items.map((t) => `<li><span class="rk-n">${t.rank ?? ""}</span><span class="rk-t">${t.id ? `<a href="#/track/${esc(t.id)}">${esc(t.track_name)}</a>` : esc(t.track_name)}<small>${artistsOf(t.artist_names)}</small></span><span class="rk-v">${t.days_top10 != null ? `${t.days_top10} of ${t.days_charted} days in top 10` : ""}</span></li>`).join("");
+  const posCards = (c.latest_chart && c.latest_chart.length) ? `
+      <div class="card"><h2>Latest chart, top 10 (${d10(c.rank_through)})</h2><ol class="chartlist">${ranked(c.latest_chart)}</ol></div>
+      <div class="card"><h2>Most days in the top 10, last 30 days</h2><ol class="chartlist">${ranked(c.top_by_rank_30d.map((t, i) => ({ ...t, rank: i + 1 })))}</ol></div>` : "";
   mount(`<div class="crumb"><a href="#/countries">Countries</a> / ${esc(c.country_name)}</div><h1>${esc(c.country_name)}</h1>
-    <p class="sub">${c.last30 == null ? `<span class="tag warn">No chart data since ${esc(String(c.last_date).slice(0, 10))}</span>` : `Latest chart day ${esc(String(c.last_date).slice(0, 10))}.`}</p>
+    <p class="sub">${sub}</p>${notice}
     ${kpis([[fmt(c.total), "Charted streams, all time"], [fmt(c.last30), "Last 30 days"], [c.mom_pct == null ? "-" : `${c.mom_pct}%`, "Change vs previous 30 days"], [fmt(last?.streams), `Last full month (${last?.ym || "-"})`]])}
     <div class="grid g2" style="margin-top:14px">
+      ${c.streams_missing ? posCards : ""}
       <div class="card" style="grid-column:1/-1"><h2>Charted streams per month</h2><div class="chart"><canvas id="c1"></canvas></div></div>
-      <div class="card"><h2>Top tracks, last 30 days</h2>${bars(c.recent_top_tracks.map((t) => ({ ...t, name: `${t.track_name} - ${String(t.artist_names).split("|").join(", ")}` })), "name", "streams", (t) => `#/track/${t.id}`) || '<p class="muted">No recent data</p>'}</div>
+      ${c.streams_missing ? "" : posCards}
+      <div class="card"><h2>Top tracks, last 30 days</h2>${bars(c.recent_top_tracks.map((t) => ({ ...t, name: `${t.track_name} - ${String(t.artist_names).split("|").join(", ")}` })), "name", "streams", (t) => `#/track/${t.id}`) || '<p class="muted">No stream counts in this window</p>'}</div>
       <div class="card"><h2>Top tracks, all time</h2>${bars(c.top_tracks.map((t) => ({ ...t, name: `${t.track_name} - ${String(t.artist_names).split("|").join(", ")}` })), "name", "streams", (t) => `#/track/${t.id}`)}</div>
       <div class="card"><h2>Top artists, all time</h2>${bars(c.top_artists, "artist", "streams")}</div>
     </div>`);
@@ -330,7 +342,7 @@ pages.health = async () => {
     <div class="grid g2">
       <div class="card"><h2>Checks <span class="tag ${h.all_ok ? "ok" : "bad"}">${h.all_ok ? "all passing" : "attention"}</span></h2>
         <table><tbody>${h.checks.map((c) => `<tr><td>${esc(c.name)}</td><td><span class="tag ${c.ok ? "ok" : "bad"}">${c.ok ? "pass" : "fail"}</span></td><td class="muted">${esc(c.detail)}</td></tr>`).join("")}</tbody></table></div>
-      <div class="card"><h2>Markets without recent stream counts</h2>${h.stale_markets.length ? `<table><tbody>${h.stale_markets.map((m) => `<tr><td>${esc(m.country_name)}</td><td class="muted">last stream data ${esc(String(m.last_date).slice(0, 10))}</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13px">The source file has no stream counts for these markets after the dates shown. That comes from the source data, not from the pipeline.</p>` : '<p class="muted">None</p>'}</div>
+      <div class="card"><h2>Markets without recent stream counts</h2>${h.stale_markets.length ? `<table><tbody>${h.stale_markets.map((m) => `<tr><td>${esc(m.country_name)}</td><td class="muted">streams through ${esc(String(m.last_date).slice(0, 10))}${m.rank_through && m.rank_through > m.last_date ? `, chart positions through ${esc(String(m.rank_through).slice(0, 10))}` : ""}</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13px">The source file has no stream counts for these markets after the dates shown (for India the chart itself continues, only the stream column is blank). That comes from the source data, not from the pipeline.</p>` : '<p class="muted">None</p>'}</div>
       <div class="card" style="grid-column:1/-1"><h2>Chart rows per day, last 45 days</h2><div class="chart"><canvas id="c1"></canvas></div></div>
     </div>`);
   barChart("c1", h.per_day.map((d) => String(d.date).slice(5, 10)), h.per_day.map((d) => d.chart_rows), { tooltip: { callbacks: { label: (c) => `${num(c.parsed.y)} rows` } } });

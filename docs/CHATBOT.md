@@ -50,6 +50,7 @@ All tools return `{ok, as_of, data, notes, links}` or `{ok: false, error, sugges
 | `track_summary` | totals, best rank, markets, last 30 days | combines chart versions of the same song (same title and artists) |
 | `compare_countries` | two countries side by side | |
 | `monthly_trend` | monthly streams for world, country, artist or track | `months` or `since`/`until` (YYYY-MM); flags a partial current month |
+| `chart_ranking` | top tracks in one country by **chart position** (days in the top 10, average position) plus today's top 5 | works for every market; used automatically when a market has no stream counts (India since 2026-08-10); window up to 60 days |
 | `biggest_movers` | climbers, new entries, fallers (last 7 days vs the 7 before) | |
 
 Entity resolution handles spelling and aliases ("USA", "UK", "Czechia"), using RapidFuzz with a high threshold; below it the tool returns
@@ -86,7 +87,7 @@ the `gemini-2.5-*` ids return 404 and were removed. Re-check with the providers'
 
 ## 7. Evaluation (`chatbot/eval/`)
 
-`make_golden.py` writes `golden.json`: 38 questions whose expected numbers are computed with plain SQL straight from the **raw Silver
+`make_golden.py` writes `golden.json`: 41 questions whose expected numbers are computed with plain SQL straight from the **raw Silver
 Parquet**, not from the chatbot's own tables, so the test cannot agree with itself by construction. `run_eval.py` runs the agent and checks:
 
 - every expected figure appears in the answer within tolerance (ranks exactly);
@@ -109,6 +110,14 @@ How the number got there, honestly:
 | After fallback chain and retries | 32 of 38 | 4 were invisible Unicode in the model's text, 1 was a real tool bug (a song with three chart versions, 3.10B instead of 3.62B), 1 was a missing month filter |
 | After fixes | 38 of 38 | |
 
+**Later the same day (India, and a fallback that did not work).** Adding India chart positions grew the set to 41. The run exposed that the Gemini fallback had never worked across a tool call:
+Gemini 3 models require a *thought signature* on every function call they see, and the agent dropped it, so every Gemini turn after a tool call returned a 400, which the user would have seen as
+"assistant busy" (27 such errors in one run). The agent now carries Gemini's signatures and gives calls made by another provider Google's documented skip marker. The same run found Groq models
+sending `null` or `months: 1`, which the tool schemas rejected; schemas are now lenient and `call_tool` treats `null` as "omitted". After those fixes the 41 cases ran with zero provider errors and
+16 answers came from Gemini. The first of those full runs scored 39 of 41; both failures were harness problems (a refusal check that counted years in an example question as "figures", and a tool check that
+only accepted `country_stats` where `chart_ranking` is equally correct), which were loosened. Final: **41 of 41 passed**, 100 % verified, average 2.5 s, p95 4.9 s (slower than before because Gemini
+answers took part).
+
 Because those fixes were driven by this set, treat 38 of 38 as a floor for "the known cases work", not as a measure of accuracy on
 unseen questions. Next steps: add held-out and multi-turn cases, and run the eval in CI with a rate-limit-aware pause.
 
@@ -120,6 +129,6 @@ the injection patterns, and tool behaviour on bad input.
 - Free-tier providers can all be limited at once; the user then sees a busy message.
 - First question after idle takes about 10 s (data download into `/tmp`).
 - The assistant has no memory beyond the last 6 messages the browser sends.
-- It can only answer what the ten tools cover: no lyrics, genres, audio features or listener counts.
+- It can only answer what the eleven tools cover: no lyrics, genres, audio features or listener counts.
 - Per-country questions beyond 60 days fall back to all time; global top lists beyond ~210 days do too.
 - Artists with identical names are merged (names, not IDs, come from the chart file).

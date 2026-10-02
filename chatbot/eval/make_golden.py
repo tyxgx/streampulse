@@ -79,9 +79,21 @@ m = one("SELECT sum(streams) FROM s WHERE date >= '2025-12-01' AND date < '2026-
 add("trend_global_dec25", "trend", "What were worldwide charted streams in December 2025?", [("global Dec 2025", m)], tools_any=["monthly_trend"])
 r = one(f"""SELECT track_name, sum(streams) s FROM s WHERE {D7} GROUP BY uri, track_name HAVING min(date) > DATE '{AS_OF}' - INTERVAL 14 DAY
             ORDER BY s DESC LIMIT 1""")
+# --- India: ranks exist, stream counts are blank since 2026-08-10 (expected values from RAW rows, no streams filter) ---
+con.execute(f"""CREATE VIEW r AS SELECT date, rank, uri, market, track_name, artist_names
+                FROM read_parquet('{args.silver}/**/*.parquet', hive_partitioning=1) WHERE rank IS NOT NULL""")
+r1 = one(f"SELECT track_name FROM r WHERE market='in' AND date = DATE '{AS_OF}' AND rank = 1")[0]
+add("india_rank_one", "india_ranks", "Which track is number one in India right now?", contains_any=[r1], tools_any=["chart_ranking", "top_tracks", "country_stats"])
+best = one(f"""SELECT arg_max(track_name, date) FROM r WHERE market='in' AND date > DATE '{AS_OF}' - INTERVAL 30 DAY
+               GROUP BY uri ORDER BY avg(rank) ASC LIMIT 1""")[0]
+add("india_best_avg_position", "india_ranks", "Which track has had the best average chart position in India over the last 30 days?",
+    contains_any=[best.split("|")[0].strip()], tools_any=["chart_ranking"])
+add("india_top_tracks_month", "india_ranks", "What are the top 3 tracks in India this month?", contains_any=[r1], tools_any=["chart_ranking", "top_tracks"],
+    must_not=["billion streams", "million streams"])
+
 # --- data quirks ---
-add("india_stale", "quirk", "How is India doing on the charts right now?", contains_any=["2026-08-09", "August 9", "9 August", "Aug 9", "no stream", "stream counts", "no recent", "blank"],
-    tools_any=["country_stats"])
+add("india_stale", "quirk", "How is India doing on the charts right now?", contains_any=["2026-08-09", "August 9", "2026-08-10", "August 10", "10 August", "Aug 10", "9 August", "Aug 9", "no stream", "stream counts", "no recent", "blank", "chart position", "rank"],
+    tools_any=["country_stats", "chart_ranking"])
 add("stale_markets", "quirk", "Which markets have stopped updating?", contains_any=["India", "Belarus", "Israel"], tools_any=["data_status"])
 add("data_freshness", "quirk", "How fresh is your data?", contains_any=[str(AS_OF), AS_OF.strftime("%B %-d"), AS_OF.strftime("%-d %B")], tools_any=["data_status"])
 # --- must refuse or admit ---

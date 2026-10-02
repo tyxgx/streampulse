@@ -65,18 +65,41 @@ class LLM:
             time.sleep(wait + 0.3)
             return self._chain(messages, tools, temperature, max_tokens)
 
+    @staticmethod
+    def _for(provider, messages):
+        """Provider-specific copy of the conversation. Gemini 3 requires a thought signature on every function call it sees
+        (its own are passed back; calls made by another provider get Google's documented skip marker). Other providers must not
+        receive that field."""
+        out = []
+        for m in messages:
+            tcs = m.get("tool_calls") if isinstance(m, dict) else None
+            if not tcs:
+                out.append(m)
+                continue
+            fixed = []
+            for tc in tcs:
+                tc = dict(tc)
+                if provider == "gemini":
+                    tc.setdefault("extra_content", {"google": {"thought_signature": "skip_thought_signature_validator"}})
+                else:
+                    tc.pop("extra_content", None)
+                fixed.append(tc)
+            out.append(dict(m, tool_calls=fixed))
+        return out
+
     def _chain(self, messages, tools, temperature, max_tokens) -> Reply:
         last, waits = None, []
         for name, client, model in self.providers:
             for attempt in range(2):
                 try:
-                    kw = dict(model=model, messages=messages, temperature=temperature, max_tokens=max_tokens)
+                    kw = dict(model=model, messages=self._for(name, messages), temperature=temperature, max_tokens=max_tokens)
                     if tools:
                         kw["tools"] = [{"type": "function", "function": t} for t in tools]
                         kw["tool_choice"] = "auto"
                     r = client.chat.completions.create(**kw)
                     m = r.choices[0].message
-                    calls = [{"id": c.id, "name": c.function.name, "arguments": c.function.arguments or "{}"}
+                    calls = [{"id": c.id, "name": c.function.name, "arguments": c.function.arguments or "{}",
+                              "extra_content": getattr(c, "extra_content", None) or (getattr(c, "model_extra", None) or {}).get("extra_content")}
                              for c in (m.tool_calls or [])]
                     u = r.usage
                     return Reply(THINK.sub("", m.content or "").strip(), calls, f"{name}:{model}",
@@ -92,7 +115,8 @@ class LLM:
                     break  # next model/provider
                 except (APIConnectionError, APIStatusError) as e:
                     last = e
-                    log.warning("%s error %s (attempt %d)", name, getattr(e, "status_code", type(e).__name__), attempt + 1)
+                    body = str(getattr(e, "message", e))[:300].replace("\n", " ")
+                    log.warning("%s/%s error %s (attempt %d): %s", name, model, getattr(e, "status_code", type(e).__name__), attempt + 1, body)
                     if isinstance(e, APIStatusError) and e.status_code < 500 and e.status_code != 429:
                         break
                     time.sleep(0.6 * (attempt + 1))

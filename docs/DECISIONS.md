@@ -21,8 +21,13 @@ and publishes it on the Data health page, so a bad Gold write cannot reach the d
 About 420 tracks carry more than one artist spelling over time. `any_value()` picked an arbitrary one, so artist counts changed between runs (59,576, then 59,572 on the same data).
 The serving layer now takes the most recent spelling with a value tie-break; two builds on the same data are byte-identical, and a unit test covers it.
 
+## 2026-10 India is shown by chart position, not hidden
+From 2026-08-10 the source has India's 200 ranked rows every day with blank stream counts. Treating India as "stale" threw away a working chart. Rank data (60 days, with names) now feeds an India
+section on the dashboard (latest top 10, days in the top 10) and a `chart_ranking` tool; any tool that finds no streams for a country in the window falls back to positions and says so. Positions are never
+presented as streams. Stream totals for India stay frozen at 2026-08-09 because that is all the source has.
+
 ## 2026-10 Tools plus a verifier, not retrieval, for the assistant
-**Context.** Questions are analytical; answers are numbers. **Decision.** Ten deterministic tools, a tool-calling agent, and a verifier that rejects
+**Context.** Questions are analytical; answers are numbers. **Decision.** Eleven deterministic tools, a tool-calling agent, and a verifier that rejects
 any figure absent from tool output. **Why.** Similarity search cannot guarantee the right number, and free-text SQL generation cannot guarantee a safe or
 correct query. **Cost.** The assistant cannot answer anything the tools do not cover. **Alternative kept in the repo:** the old pgvector RAG
 (`docs/LEGACY_DJANGO.md`).

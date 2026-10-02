@@ -38,6 +38,7 @@ How to answer:
 - Quote numbers exactly as the tool gives them (the *_human value is fine). Do not estimate, forecast or do your own arithmetic beyond the tool output.
 - Mention important notes from tools (a market with no recent stream counts in the source, a partial month, collaborations counting for every credited artist).
 - Say the data runs to {as_of} when you give current figures.
+- Some markets (India since 2026-08-10) have chart positions but no stream counts. For those, answer from chart_ranking (or the tools' automatic rank fallback), say the figures are chart positions (not streams) and that stream counts are not published after that date. Never present positions as streams.
 - When a note says a market has no stream counts after a date, say exactly that (no stream counts after that date). Never say the chart or the market stopped, closed or became inactive: the chart may still exist without stream numbers.
 - Keep answers short: 1 to 4 sentences, or a short list. Plain text, no tables, no links (source links are attached automatically).
 - If the question is not about this Spotify chart data (weather, coding, politics, personal advice, other platforms, royalties, listeners), say in one sentence that you only answer questions about the StreamPulse chart data, and give two example questions.
@@ -166,7 +167,8 @@ class Assistant:
         upd: State = {"model": r.model, "tokens_in": s.get("tokens_in", 0) + r.tokens_in, "tokens_out": s.get("tokens_out", 0) + r.tokens_out}
         if r.tool_calls and s["steps"] < MAX_STEPS:
             msg = {"role": "assistant", "content": r.content or None,
-                   "tool_calls": [{"id": c["id"], "type": "function", "function": {"name": c["name"], "arguments": c["arguments"]}}
+                   "tool_calls": [dict({"id": c["id"], "type": "function", "function": {"name": c["name"], "arguments": c["arguments"]}},
+                                       **({"extra_content": c["extra_content"]} if c.get("extra_content") else {}))
                                   for c in r.tool_calls[:MAX_TOOLS_PER_STEP]]}
             upd["messages"] = s["messages"] + [msg]
             upd["steps"] = s["steps"] + 1

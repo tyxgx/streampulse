@@ -62,7 +62,7 @@ def _sync_data() -> bool:
         return False
     DATA_DIR.mkdir(exist_ok=True)
     for t in ("daily_country", "track_all", "track_month", "track_country", "track_artist",
-              "artist_all", "track_day", "track_country_day"):
+              "artist_all", "track_day", "track_country_day", "rank_country_day"):
         s3.download_file(LAKE, f"{PREFIX}{t}.parquet", str(DATA_DIR / f"{t}.parquet"))
     _state["etag"] = head["ETag"]
     return True

@@ -60,7 +60,7 @@ class Facts:
         self.con = duckdb.connect()
         self.con.execute("SET threads=2; SET memory_limit='1GB'")
         for t in ("daily_country", "track_all", "track_month", "track_country",
-                  "track_artist", "artist_all", "track_day", "track_country_day"):
+                  "track_artist", "artist_all", "track_day", "track_country_day", "rank_country_day"):
             self.con.execute(f"CREATE VIEW {t} AS SELECT * FROM read_parquet('{d / (t + '.parquet')}')")
         self.as_of = self.con.execute("SELECT max(date) FROM daily_country").fetchone()[0]
         self.first = self.con.execute("SELECT min(date) FROM daily_country").fetchone()[0]
@@ -154,8 +154,12 @@ class Facts:
     def data_status(self):
         stale = self.q("""SELECT country_name, max(date)::VARCHAR AS last_date FROM daily_country
                           GROUP BY 1 HAVING max(date) < DATE '%s' - INTERVAL 3 DAY ORDER BY 2""" % self.as_of)
+        for r in stale:
+            m = self._cname.get(r["country_name"].lower())
+            r["last_stream_date"] = r.pop("last_date")
+            r["chart_positions_through"] = self._rank_through(m) if m else None
         return self._ok({"first_date": str(self.first), "last_date": str(self.as_of), "markets": len(self.countries),
-                         "markets_without_recent_data": stale},
+                         "markets_without_recent_stream_counts": stale},
                         links=[{"label": "Data health", "href": "#/health"}])
 
     def global_overview(self, period: str = "last_30_days"):
@@ -197,6 +201,12 @@ class Facts:
                 data["share_of_all_markets_pct"] = round(100.0 * cur / glob, 1)
             if prev and cur is not None:
                 data["change_vs_previous_period_pct"] = round(100.0 * (cur - prev) / prev, 1)
+        rt = self._rank_through(m)
+        if rt:
+            data["chart_positions_through"] = rt
+        if rt and rt > last_date and data.get("streams") in (None, 0):
+            data["stream_counts_available"] = False
+            notes.append(f"Stream counts for {name} are missing after {last_date}, but chart positions continue through {rt}. Use chart_ranking for current standings.")
         return self._ok(data, notes, [{"label": name, "href": f"#/country/{m}"}])
 
     def top_tracks(self, period: str = "last_30_days", country: str | None = None, limit: int = 5):
@@ -230,6 +240,8 @@ class Facts:
                     notes.append(f"Global windows are limited to {GLOBAL_TRACK_WINDOW_MAX} days; showing all-time instead.")
                     period = "all_time"
                 rows = self.q("SELECT uri, track_name, artist_names, streams FROM track_all ORDER BY streams DESC LIMIT ?", limit)
+        if country and not rows:
+            return self._rank_fallback(m, days, limit, "tracks")
         out = []
         for i, r in enumerate(rows, 1):
             out.append({"rank": i, "track": r["track_name"], "artists": r["artist_names"].replace("|", ", "),
@@ -270,6 +282,19 @@ class Facts:
                     notes.append(f"Global windows are limited to {GLOBAL_TRACK_WINDOW_MAX} days; showing all-time instead.")
                     period = "all_time"
                 rows = self.q("SELECT artist, streams FROM artist_all ORDER BY streams DESC LIMIT ?", limit)
+        if country and not rows:
+            rt = self._rank_through(m)
+            if rt:
+                d = 7 if (days and days <= 7) else 30
+                arows = self.q(f"""SELECT artist, count(*) FILTER (WHERE rank <= 10) AS track_days_in_top10, count(DISTINCT uri) AS tracks FROM (
+                                     SELECT trim(unnest(string_split(artist_names, '|'))) AS artist, rank, uri FROM rank_country_day
+                                     WHERE market = ? AND date > DATE '{rt}' - INTERVAL {d} DAY) GROUP BY 1
+                                   ORDER BY 2 DESC, 3 DESC LIMIT ?""", m, limit)
+                return self._ok({"scope": scope, "basis": "chart position", "period": f"last_{d}_days", "positions_through": rt,
+                                 "artists": [{"rank": i, "artist": r["artist"], "track_days_in_top10": r["track_days_in_top10"],
+                                              "tracks_charted": r["tracks"]} for i, r in enumerate(arows, 1)]},
+                                [f"Stream counts for {scope} are not available for this window, so artists are ranked by how many track-days they had in the top 10.",
+                                 "These are chart positions, not stream counts. Collaborations count for every credited artist."], links)
         out = []
         for i, r in enumerate(rows, 1):
             out.append({"rank": i, "artist": r["artist"], "streams": r["streams"], "streams_human": human(r["streams"])})
@@ -387,6 +412,47 @@ class Facts:
         series = [{"month": r["ym"], "streams": r["s"], "streams_human": human(r["s"])} for r in rows]
         return self._ok({"subject": subject, "name": name, "months": series}, partial_note, links)
 
+    def _rank_through(self, m):
+        r = self.q("SELECT max(date)::VARCHAR AS d FROM rank_country_day WHERE market = ?", m)[0]["d"]
+        return r
+
+    def chart_ranking(self, country: str, period: str = "last_30_days", limit: int = 5):
+        """Standings by chart POSITION. Works for every market, including ones whose stream counts are missing."""
+        m, sug = self.resolve_country(country)
+        if not m:
+            return self._err(f"Unknown country '{country}'", sug)
+        limit = max(1, min(int(limit), MAX_LIMIT))
+        days = self._window(period)
+        notes = []
+        if days is None or days > COUNTRY_WINDOW_MAX:
+            notes.append(f"Chart positions are kept for the last {COUNTRY_WINDOW_MAX} days; showing last_60_days.")
+            days, period = COUNTRY_WINDOW_MAX, "last_60_days"
+        name = self.countries[m]
+        rt = self._rank_through(m)
+        if not rt:
+            return self._err(f"No chart positions for {name}")
+        tracks = self.q(f"""SELECT uri, arg_max(track_name, date) AS track, arg_max(artist_names, date) AS artists,
+                                   count(*) FILTER (WHERE rank <= 10) AS days_in_top10, min(rank) AS best_rank,
+                                   round(avg(rank), 1) AS avg_rank, count(*) AS days_charted
+                            FROM rank_country_day WHERE market = ? AND date > DATE '{rt}' - INTERVAL {days} DAY
+                            GROUP BY uri ORDER BY days_in_top10 DESC, avg_rank ASC LIMIT ?""", m, limit)
+        latest = self.q("SELECT rank, track_name AS track, artist_names AS artists FROM rank_country_day WHERE market = ? AND date = ? ORDER BY rank LIMIT 5", m, rt)
+        for t in tracks + latest:
+            t["artists"] = t["artists"].replace("|", ", ")
+        links = [{"label": name, "href": f"#/country/{m}"}] + [x for x in (self._track_link(t["uri"], t["track"]) for t in tracks) if x]
+        for t in tracks:
+            t.pop("uri", None)
+        notes.append("Ranked by days in the top 10, then average chart position. These are chart positions, not stream counts.")
+        return self._ok({"country": name, "basis": "chart position", "period": period, "positions_through": rt,
+                         "latest_top5": latest, "tracks": tracks}, notes, links)
+
+    def _rank_fallback(self, m, days, limit, what):
+        """Used when a market has no stream counts in the window: answer from chart positions instead."""
+        res = self.chart_ranking(self.countries[m], "last_30_days" if not days or days > 30 else ("last_7_days" if days <= 7 else "last_30_days"), limit)
+        if res["ok"]:
+            res["notes"].insert(0, f"Stream counts for {self.countries[m]} are not available for this window, so {what} are ranked by chart position instead.")
+        return res
+
     def biggest_movers(self, kind: str = "climbers", limit: int = 5):
         limit = max(1, min(int(limit), MAX_LIMIT))
         base = f"""
@@ -425,13 +491,14 @@ TOOL_SPECS = [
     {"name": "data_status", "description": "Freshness of the data and markets with no recent stream counts in the source.", "parameters": {"type": "object", "properties": {}}},
     {"name": "global_overview", "description": "Total charted streams across all markets, number of tracks/artists, and change vs the previous period.", "parameters": {"type": "object", "properties": {"period": _PERIOD}}},
     {"name": "country_stats", "description": "Streams for one country in a period, its share of all markets, change vs previous period, and data freshness.", "parameters": {"type": "object", "properties": {"country": {"type": "string"}, "period": _PERIOD}, "required": ["country"]}},
-    {"name": "top_tracks", "description": "Most-streamed tracks, globally or in one country. Country windows are limited to 60 days.", "parameters": {"type": "object", "properties": {"period": _PERIOD, "country": {"type": "string", "description": "Optional. Omit for global."}, "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT}}}},
-    {"name": "top_artists", "description": "Most-streamed artists, globally or in one country. Collaborations count for every credited artist.", "parameters": {"type": "object", "properties": {"period": _PERIOD, "country": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT}}}},
+    {"name": "top_tracks", "description": "Most-streamed tracks, globally or in one country. Country windows are limited to 60 days.", "parameters": {"type": "object", "properties": {"period": _PERIOD, "country": {"type": ["string", "null"], "description": "Optional. Omit or null for global."}, "limit": {"type": "integer", "description": "1 to 15; larger values are capped"}}}},
+    {"name": "top_artists", "description": "Most-streamed artists, globally or in one country. Collaborations count for every credited artist.", "parameters": {"type": "object", "properties": {"period": _PERIOD, "country": {"type": ["string", "null"], "description": "Optional. Omit or null for global."}, "limit": {"type": "integer", "description": "1 to 15; larger values are capped"}}}},
     {"name": "artist_summary", "description": "Profile of one artist: rank, streams, top tracks, top markets, last-30-day streams.", "parameters": {"type": "object", "properties": {"artist": {"type": "string"}}, "required": ["artist"]}},
-    {"name": "track_summary", "description": "Profile of one track: streams, best rank, markets, last-30-day streams.", "parameters": {"type": "object", "properties": {"track": {"type": "string"}, "artist": {"type": "string", "description": "Optional, to disambiguate."}}, "required": ["track"]}},
+    {"name": "track_summary", "description": "Profile of one track: streams, best rank, markets, last-30-day streams.", "parameters": {"type": "object", "properties": {"track": {"type": "string"}, "artist": {"type": ["string", "null"], "description": "Optional, to disambiguate."}}, "required": ["track"]}},
     {"name": "compare_countries", "description": "Compare two countries over a period.", "parameters": {"type": "object", "properties": {"country_a": {"type": "string"}, "country_b": {"type": "string"}, "period": _PERIOD}, "required": ["country_a", "country_b"]}},
-    {"name": "monthly_trend", "description": "Monthly streams for the whole world, one country, one artist or one track.", "parameters": {"type": "object", "properties": {"subject": {"type": "string", "enum": ["global", "country", "artist", "track"]}, "name": {"type": "string", "description": "Required unless subject is global."}, "months": {"type": "integer", "minimum": 2, "maximum": 120, "description": "How many most-recent months. Ignored if since is given."}, "since": {"type": "string", "description": "First month, YYYY-MM. Use for a specific past month or range."}, "until": {"type": "string", "description": "Last month, YYYY-MM. Optional."}}, "required": ["subject"]}},
-    {"name": "biggest_movers", "description": "Tracks rising fastest, newly entered, or dropping, comparing the last 7 days with the 7 days before.", "parameters": {"type": "object", "properties": {"kind": {"type": "string", "enum": ["climbers", "new_entries", "fallers"]}, "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT}}, "required": ["kind"]}},
+    {"name": "monthly_trend", "description": "Monthly streams for the whole world, one country, one artist or one track.", "parameters": {"type": "object", "properties": {"subject": {"type": "string", "enum": ["global", "country", "artist", "track"]}, "name": {"type": ["string", "null"], "description": "Required unless subject is global."}, "months": {"type": "integer", "description": "How many most-recent months (2 to 120; out-of-range values are clamped). Ignored if since is given."}, "since": {"type": ["string", "null"], "description": "First month, YYYY-MM. Use for a specific past month or range."}, "until": {"type": ["string", "null"], "description": "Last month, YYYY-MM. Optional."}}, "required": ["subject"]}},
+    {"name": "chart_ranking", "description": "Top tracks in ONE country by chart POSITION (days in the top 10, average position), plus today's top 5. Use it when stream counts are missing for a market (for example India since 2026-08-10) or when the user asks about chart positions. Window up to 60 days.", "parameters": {"type": "object", "properties": {"country": {"type": "string"}, "period": {"type": "string", "enum": ["last_7_days", "last_30_days", "last_60_days"]}, "limit": {"type": "integer", "description": "1 to 15; larger values are capped"}}, "required": ["country"]}},
+    {"name": "biggest_movers", "description": "Tracks rising fastest, newly entered, or dropping, comparing the last 7 days with the 7 days before.", "parameters": {"type": "object", "properties": {"kind": {"type": "string", "enum": ["climbers", "new_entries", "fallers"]}, "limit": {"type": "integer", "description": "1 to 15; larger values are capped"}}, "required": ["kind"]}},
 ]
 TOOL_NAMES = {s["name"] for s in TOOL_SPECS}
 
@@ -442,7 +509,7 @@ def call_tool(facts: Facts, name: str, args: dict):
         return Facts._err(f"Unknown tool '{name}'")
     try:
         allowed = next(s for s in TOOL_SPECS if s["name"] == name)["parameters"]["properties"]
-        clean = {k: v for k, v in (args or {}).items() if k in allowed}
+        clean = {k: v for k, v in (args or {}).items() if k in allowed and v is not None}  # null means omitted
         return getattr(facts, name)(**clean)
     except (ValueError, TypeError) as e:
         return Facts._err(str(e))

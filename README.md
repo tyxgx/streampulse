@@ -30,7 +30,7 @@ flowchart LR
   U[Browser] --> S
   U -->|POST /ask| F[Lambda Function URL]
   F --> A[LangGraph agent]
-  A --> T[10 tools<br/>DuckDB over Parquet]
+  A --> T[11 tools<br/>DuckDB over Parquet]
   C --> T
   A --> M[Groq / Gemini]
   F --> D[(DynamoDB<br/>rate limits)]
@@ -53,15 +53,16 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/CHATBOT.md](docs/CH
 
 ## The assistant in one minute
 
-- **Numbers come from tools, not from the model.** Ten tested functions (country stats, top tracks and artists, artist and
+- **Numbers come from tools, not from the model.** Eleven tested functions (country stats, top tracks and artists, chart rankings, artist and
   track profiles, comparison, monthly trend, movers, data status) return facts with links to the matching dashboard page.
 - **Verification.** Every figure in an answer must trace back to a tool result (1 % tolerance, or the rounding of a displayed
   value). One rewrite is attempted, then a visible disclaimer is added.
 - **Guardrails.** Obvious injection and secret requests are refused before any model call. Off-topic questions get a one-line
   refusal. Track and artist names inside tool results are treated as data, never as instructions.
-- **Honest about gaps.** Markets with no recent stream counts in the source (India since 2026-08-10, where ranks continue but streams are blank; Belarus and Israel since March, where rows stop) are flagged
-  in the answer.
-- **Evaluated.** 38 golden questions with expected numbers computed from the raw data by independent SQL: 38 of 38 pass,
+- **Honest about gaps, and still useful.** India's source rows keep their 200 chart positions every day but the stream counts have been blank since 2026-08-10. The dashboard and
+  the assistant therefore show India by chart position (latest top 10, days in the top 10, average position) and say clearly that these are positions, not streams.
+  Belarus and Israel have no rows after March.
+- **Evaluated.** 41 golden questions with expected answers computed from the raw data by independent SQL: 41 of 41 pass,
   100 % of answers verified, average 1.7 s, p95 3.5 s (see [docs/CHATBOT.md](docs/CHATBOT.md) for method and caveats).
 
 ## Repository map
@@ -108,7 +109,7 @@ $3 per month (credits not netted out) alerts by email. The LLM calls use free ti
 - **Cold starts.** The first chat question after idle takes about 10 seconds (the Lambda downloads 63 MB of data). Later ones take about 2 seconds.
 - **Source data.** The Kaggle source has no stream counts for India after 2026-08-09 (ranks continue, streams are blank) and no rows at all for Belarus and Israel after March; they are shown as stale. Artist and track
   detail pages exist for the top 300 artists and top 500 tracks only. Per-country windows in the assistant are limited to 60 days.
-- **Eval caveat.** The golden set is small (38) and two tool bugs were fixed after seeing its failures, so 38 of 38 is optimistic.
+- **Eval caveat.** The golden set is small (41), and tool bugs and two overly strict checks were fixed after seeing its failures, so 41 of 41 is optimistic.
   It should grow with unseen questions.
 - **Concurrency.** The AWS account allows 10 concurrent Lambdas, shared with another project, so a reserved-concurrency cap is not available; limits are enforced in DynamoDB.
 

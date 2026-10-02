@@ -75,6 +75,18 @@ def build_intermediates(con, silver_glob):
         FROM read_parquet('{silver_glob}', hive_partitioning=1)
         WHERE streams IS NOT NULL AND country_name IS NOT NULL
     """)
+    # Rankings exist even where stream counts are blank (India since 2026-08-10), so keep a view without the streams filter.
+    con.execute(f"""
+        CREATE OR REPLACE VIEW s_rank AS
+        SELECT date, rank, uri, market, country_name, track_name, artist_names
+        FROM read_parquet('{silver_glob}', hive_partitioning=1)
+        WHERE rank IS NOT NULL AND country_name IS NOT NULL
+    """)
+    con.execute("""
+        CREATE OR REPLACE TABLE rank_country_day AS
+        SELECT uri, market, date, rank::INTEGER AS rank, track_name, artist_names FROM s_rank
+        WHERE date > (SELECT max(date) FROM s_rank) - INTERVAL 60 DAY
+    """)
     con.execute("""
         CREATE OR REPLACE TABLE daily_country AS
         SELECT date, market, country_name, sum(streams)::BIGINT AS streams,
@@ -204,8 +216,22 @@ def build_countries(con, out, mx):
                round(100.0 * (l.s - p.s) / nullif(p.s, 0), 1) AS mom_pct
         FROM yr LEFT JOIN last30 l USING (market) LEFT JOIN prev30 p USING (market)
         ORDER BY last30 DESC NULLS LAST""", mx, mx, mx)
+    rank_through = {r["market"]: r["d"] for r in rows(con, "SELECT market, max(date) AS d FROM s_rank GROUP BY 1")}
+    page_uris = {r["uri"] for r in rows(con, "SELECT uri FROM track_all ORDER BY streams DESC LIMIT ?", TOP_TRACKS_PAGES)}
     for c in summary:
         m = c["market"]
+        rt = rank_through.get(m)
+        c["rank_through"] = str(rt) if rt else None
+        # stream counts missing while the chart itself continues (India since 2026-08-10)
+        c["streams_missing"] = bool(rt and c["last_date"] and rt - c["last_date"] > dt.timedelta(days=3))
+        c["latest_chart"] = [dict(r, id=slug(r["uri"]) if r["uri"] in page_uris else None, uri=None) for r in rows(con, """
+            SELECT rank, track_name, artist_names, uri FROM s_rank WHERE market = ? AND date = ? ORDER BY rank LIMIT 10""", m, rt)] if rt else []
+        c["top_by_rank_30d"] = [dict(r, id=slug(r["uri"]) if r["uri"] in page_uris else None, uri=None) for r in rows(con, """
+            SELECT uri, arg_max(track_name, date) AS track_name, arg_max(artist_names, date) AS artist_names,
+                   count(*) FILTER (WHERE rank <= 10) AS days_top10, min(rank) AS best_rank,
+                   round(avg(rank), 1) AS avg_rank, count(*) AS days_charted
+            FROM s_rank WHERE market = ? AND date > ?::DATE - INTERVAL 30 DAY
+            GROUP BY uri ORDER BY days_top10 DESC, avg_rank ASC LIMIT 10""", m, rt)] if rt else []
         if GOLD["ok"]:
             c["monthly"] = rows(con, """
                 SELECT printf('%04d-%02d', year, month) AS ym, total_streams::BIGINT AS streams
@@ -238,7 +264,7 @@ def build_countries(con, out, mx):
         dump(out / "country" / f"{m}.json", c)
     # index file is light: no series
     dump(out / "countries.json",
-         [{k: v for k, v in c.items() if k in ("market", "country_name", "total", "last30", "mom_pct", "last_date")}
+         [{k: v for k, v in c.items() if k in ("market", "country_name", "total", "last30", "mom_pct", "last_date", "rank_through", "streams_missing")}
           for c in summary])
 
 
@@ -396,8 +422,10 @@ def build_health(con, out, mn, mx):
                count(*) FILTER (WHERE rank IS NULL) AS no_rank
         FROM s WHERE date > ?::DATE - INTERVAL 45 DAY""", mx)[0]
     stale = rows(con, """
-        SELECT country_name, max(date) AS last_date FROM daily_country
-        GROUP BY 1 HAVING max(date) < ?::DATE - INTERVAL 3 DAY ORDER BY 2""", mx)
+        WITH rt AS (SELECT country_name, max(date) AS rank_through FROM s_rank GROUP BY 1)
+        SELECT d.country_name, max(d.date) AS last_date, any_value(rt.rank_through) AS rank_through
+        FROM daily_country d JOIN rt USING (country_name)
+        GROUP BY 1 HAVING max(d.date) < ?::DATE - INTERVAL 3 DAY ORDER BY 2""", mx)
     rec = reconcile(con)
     today = dt.datetime.now(dt.timezone.utc).date()
     lag = (today - mx).days
@@ -422,7 +450,7 @@ def build_health(con, out, mn, mx):
 
 
 CHAT_TABLES = ("daily_country", "track_all", "track_month", "track_country",
-               "track_artist", "artist_all", "track_day", "track_country_day")
+               "track_artist", "artist_all", "track_day", "track_country_day", "rank_country_day")
 
 
 def export_chat(con, outdir: Path):
