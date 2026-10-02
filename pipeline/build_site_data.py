@@ -87,6 +87,12 @@ def build_intermediates(con, silver_glob):
         FROM s WHERE date >= (SELECT max(date) FROM s) - INTERVAL 210 DAY
         GROUP BY ALL
     """)
+    con.execute("""
+        CREATE OR REPLACE TABLE track_country_day AS
+        SELECT uri, market, date, sum(streams)::BIGINT AS streams, min(rank) AS rank
+        FROM s WHERE date > (SELECT max(date) FROM s) - INTERVAL 60 DAY
+        GROUP BY ALL
+    """)
     # artist credit split: every credited artist gets the track's streams
     con.execute("""
         CREATE OR REPLACE TABLE track_artist AS
@@ -341,11 +347,24 @@ def build_health(con, out, mn, mx):
                                    all_ok=all(c["ok"] for c in checks)))
 
 
+CHAT_TABLES = ("daily_country", "track_all", "track_month", "track_country",
+               "track_artist", "artist_all", "track_day", "track_country_day")
+
+
+def export_chat(con, outdir: Path):
+    """Compact Parquet the chatbot's tools query (small enough for a Lambda /tmp)."""
+    outdir.mkdir(parents=True, exist_ok=True)
+    for t in CHAT_TABLES:
+        con.execute(f"COPY {t} TO '{outdir / (t + '.parquet')}' (FORMAT parquet, COMPRESSION zstd)")
+    log.info("chat tables exported to %s", outdir)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lake", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--db", default=":memory:")
+    ap.add_argument("--chat-out", help="also export the chatbot tables here")
     ap.add_argument("--memory-limit", default="3GB")
     ap.add_argument("--threads", type=int, default=2)
     args = ap.parse_args()
@@ -365,6 +384,8 @@ def main():
         fn(con, out, mx)
         log.info("%s done (%.0fs)", fn.__name__, time.time() - t0)
     build_health(con, out, mn, mx)
+    if args.chat_out:
+        export_chat(con, Path(args.chat_out))
     log.info("all done in %.0fs: %s", time.time() - t0, meta)
 
 
