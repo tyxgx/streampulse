@@ -18,6 +18,7 @@ concurrency:
 
 env:
   LAKE_BUCKET: streampulse-lake-922120357133
+  SITE_BUCKET: streampulse-site-922120357133
   AWS_REGION: ap-south-1
   KAGGLE_SLUG: gonzalopezgil/spotify-charts-daily-updated
   KAGGLE_FILE: charts_songs_daily.csv
@@ -87,6 +88,21 @@ jobs:
               --delete --only-show-errors
           done < lake/state/affected_partitions.txt
           aws s3 cp lake/state/last_run.json "s3://$LAKE_BUCKET/state/last_run.json"
+
+      - name: Build dashboard data
+        run: |
+          if grep -q '"status": "up_to_date"' run_summary.json; then echo "nothing new"; exit 0; fi
+          aws s3 sync "s3://$LAKE_BUCKET/silver" lake/silver --only-show-errors
+          python pipeline/build_site_data.py --lake lake --out site_data --memory-limit 5GB
+          echo "SITE_DATA_BUILT=1" >> "$GITHUB_ENV"
+
+      - name: Publish dashboard to S3
+        if: env.SITE_DATA_BUILT == '1'
+        run: |
+          aws s3 sync site_data "s3://$SITE_BUCKET/data" --delete --only-show-errors \
+            --cache-control "public, max-age=300" --content-type application/json
+          aws s3 sync dashboard "s3://$SITE_BUCKET" --only-show-errors --cache-control "public, max-age=300" \
+            --exclude "data/*"
 
       - name: Summary
         if: always()

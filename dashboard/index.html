@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StreamPulse - Spotify charts analytics</title>
+<meta name="description" content="Daily Spotify chart analytics across 72 markets: trends, artists, tracks, labels and data health, refreshed every day.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231db954'/%3E%3Cpath d='M5 17h5l3-8 5 15 3-9h6' fill='none' stroke='%23062' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#/"><span class="logo"></span>StreamPulse</a>
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('navopen')">&#9776;</button>
+  <nav id="nav">
+    <a href="#/" data-r="">Overview</a>
+    <a href="#/map" data-r="map">World map</a>
+    <a href="#/countries" data-r="countries">Countries</a>
+    <a href="#/artists" data-r="artists">Artists</a>
+    <a href="#/tracks" data-r="tracks">Tracks</a>
+    <a href="#/trending" data-r="trending">Trending</a>
+    <a href="#/labels" data-r="labels">Labels</a>
+    <a href="#/seasonality" data-r="seasonality">Seasonality</a>
+    <a href="#/health" data-r="health">Data health</a>
+  </nav>
+  <span id="asof" class="asof"></span>
+</header>
+<main id="app" aria-live="polite"><p class="muted pad">Loading&hellip;</p></main>
+<footer>
+  Data: daily Spotify top-200 charts (Kaggle, refreshed daily). "Charted streams" = streams of tracks on a market's
+  top-200 chart, not total Spotify streams. &middot; Built by Uttkarsh Tyagi &middot;
+  <a href="https://github.com/tyxgx/streampulse">GitHub</a>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
