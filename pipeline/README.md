@@ -34,16 +34,18 @@ cd pipeline && python -m pytest -q tests
 python refresh.py --csv /path/charts_songs_daily.csv --lake ./lake
 ```
 
-## One-time setup for the workflow (`.github/workflows/daily-refresh.yml`)
-Repo **Settings → Secrets and variables → Actions**:
+## Setup for the workflow (`.github/workflows/daily-refresh.yml`)
+AWS access uses GitHub OIDC; there are no AWS keys to store. `infra/terraform` creates the lake and site buckets and the role
+`streampulse-github-pipeline`. The only repository secrets are the Kaggle credentials:
 
 | Kind | Name | Value |
 |---|---|---|
-| Variable | `LAKE_BUCKET` | `streampulse-lake-dev-data` |
-| Variable | `AWS_REGION` | `ap-south-1` |
 | Secret | `KAGGLE_USERNAME`, `KAGGLE_KEY` | Kaggle API credentials |
-| Secret | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | a dedicated IAM user limited to the lake bucket |
 
-Least-privilege policy for that IAM user (`s3:ListBucket` on the bucket, get/put/delete on `gold/*`,
-`silver/*`, `state/*`). Then run the workflow once by hand (**Actions → daily-refresh → Run workflow**)
-for the full bootstrap; after that the 03:30 UTC schedule takes over.
+Bucket names and region are set in the workflow `env`. Run the workflow once by hand (**Actions → daily-refresh → Run workflow**); after that the
+03:30 UTC schedule takes over. The first run on an empty lake is a full-history bootstrap, so seed Silver from a backup if you have one.
+
+After the Silver/Gold refresh the same job runs `build_site_data.py` (dashboard JSON plus the chatbot Parquet) and publishes to S3.
+See [../docs/OPERATIONS.md](../docs/OPERATIONS.md) for the runbook and [../docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) for the data flow.
+
+`duckdb` is pinned to 1.5.5 in `requirements.txt` because 1.5.6 fails the tests with an internal optimizer error.

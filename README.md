@@ -1,108 +1,116 @@
 # StreamPulse
 
-A Django web app with a Spotify streaming-analytics dashboard and a RAG (Retrieval-Augmented
-Generation) chatbot that answers natural-language questions grounded in real data — not
-hallucinated numbers.
+Daily Spotify chart analytics for 72 markets, served as a static dashboard plus a grounded chat assistant. It runs
+serverless on AWS, refreshes itself every morning, and costs a few dollars a month at most.
 
-Built independently on top of a Spotify Gold data lake (S3, Hive-partitioned Parquet) from a
-CDAC PGCP-BDA team capstone project I contributed to on architecture and pipeline design. The
-Django app, the Postgres/pgvector RAG pipeline, the chatbot, and the AWS EC2 deployment are my
-own end-to-end build.
+**Live:** http://streampulse-site-922120357133.s3-website.ap-south-1.amazonaws.com/ (HTTP only, see [Limitations](#limitations))
 
-## What it does
-
-- **Analytics dashboard** — Spotify streaming data by artist, country, and label, backed by
-  Postgres tables loaded from the S3 Gold layer (Parquet, Hive-partitioned by year).
-- **RAG chatbot** — ask questions like *"How did Kendrick Lamar perform in 2024?"* or
-  *"Compare India and Brazil"* and get answers grounded in the actual Gold data, with a
-  confidence gate that refuses to answer (rather than guess) when nothing relevant is found.
-
-## Tech stack
-
-| Layer | Choice |
+| | |
 |---|---|
-| Data lake (source) | AWS S3, Parquet, Hive-partitioned by year |
-| Database | PostgreSQL 17 + `pgvector` (`ivfflat` approximate nearest-neighbor index) |
-| Embeddings | `all-MiniLM-L6-v2` (SentenceTransformers, local, free, 384-dim) |
-| LLM | Groq (`llama-3.3-70b-versatile`) → Gemini → local Ollama (`llama3.2:3b`) fallback chain |
-| Backend | Django 6 + Django REST Framework |
-| Cache | Redis (chatbot response cache + per-provider usage tracking, fails open if unreachable) |
-| Deployment | AWS EC2 (`t3.small`, Ubuntu 22.04, `ap-south-1`), Nginx + Gunicorn, systemd |
+| Data | Daily top-200 Spotify charts, 2017-01-01 to the latest day. 43.9 million chart rows, 251,278 tracks, 59,576 artists, 72 markets |
+| Dashboard | Home page and 9 views: overview, world map, countries (72 pages), artists (300), tracks (500), trending, labels, seasonality, data health |
+| Assistant | "Ask StreamPulse": a LangGraph agent that answers only from deterministic tools, and checks every number it states |
+| Refresh | GitHub Actions, daily at 03:30 UTC. Kaggle to DuckDB to S3, about 7 minutes end to end |
+| Hosting | S3 website (static site), Lambda container (chat), DynamoDB (rate limits). No servers |
 
-## How the RAG pipeline works
+"Streams" everywhere means **charted streams**: the streams of tracks that were on a market's daily top-200 chart. It is not
+total Spotify streams, royalties or monthly listeners.
 
-```
-S3 Gold layer (Parquet)
-      │  scripts/load_gold_to_postgres.py — boto3 + pyarrow → psycopg2
-      ▼
-Postgres — 5 Gold tables (artist/country/label/dashboard/monthly)
-      │  scripts/build_gold_chunks.py — aggregates to yearly grain, turns each row
-      │  into an English sentence, embeds it with all-MiniLM-L6-v2
-      ▼
-Postgres — gold_chunks (source_table, source_key, chunk_text, embedding vector(384))
-      │  pgvector ivfflat index for fast nearest-neighbor search
-      ▼
-User question → embedded the same way → top-k nearest chunks retrieved
-      │  routed one of three ways: exact SQL for aggregate questions ("which is highest"),
-      │  per-entity scoped retrieval for comparisons, or single-entity vector search
-      ▼
-Confidence gate (skip the LLM entirely if nothing relevant enough was found)
-      │
-      ▼
-Prompt = retrieved chunks as context + question → Groq/Gemini/Ollama → grounded answer
+## How it works
+
+```mermaid
+flowchart LR
+  K[Kaggle<br/>daily charts CSV] -->|GitHub Actions, 03:30 UTC| R[refresh.py<br/>DuckDB]
+  R --> L[(S3 lake<br/>silver / gold)]
+  L --> B[build_site_data.py]
+  B -->|8 MB JSON| S[(S3 site<br/>static dashboard)]
+  B -->|63 MB Parquet| C[(S3 lake/chat)]
+  U[Browser] --> S
+  U -->|POST /ask| F[Lambda Function URL]
+  F --> A[LangGraph agent]
+  A --> T[10 tools<br/>DuckDB over Parquet]
+  C --> T
+  A --> M[Groq / Gemini]
+  F --> D[(DynamoDB<br/>rate limits)]
 ```
 
-## Engineering notes worth knowing
+1. **Ingest.** A scheduled workflow downloads the Kaggle file, keeps rows from a 7-day lookback, and rebuilds only the
+   months those rows touch (Silver), then the Gold tables. See [pipeline/README.md](pipeline/README.md).
+2. **Precompute.** `build_site_data.py` aggregates the 44 million rows once into small JSON files for the browser and a
+   compact Parquet set for the chatbot. Visitors never trigger a query.
+3. **Serve.** The dashboard is plain HTML, CSS and JavaScript on S3. It fetches the JSON and draws charts with Chart.js and D3.
+4. **Ask.** The chat widget calls a Lambda. An agent picks tools, the tools run SQL over Parquet, the model writes a short
+   answer, and a verifier rejects any figure that no tool returned.
 
-- **Confidence gate.** Out-of-scope questions sometimes scored deceptively close in vector
-  space, producing confidently-wrong answers. A distance threshold now makes the bot say
-  "I don't have data to answer that" instead of guessing.
-- **SQL router for aggregates.** Questions like "which country has the most streams" can't be
-  answered from 5 similar-looking chunks — those are keyword-routed to a direct SQL query
-  against the Gold tables instead of the RAG path.
-- **Per-entity scoped retrieval for comparisons.** A single shared top-k search let one entity's
-  chunks crowd out the other's when comparing two countries/artists — retrieval is now done
-  separately per entity and merged.
-- **LLM fallback chain.** Groq first (fast, generous free tier), Gemini second (added after
-  Groq's 100K-tokens/day cap got exhausted repeatedly), local Ollama last (free, no API key,
-  always available as a last resort).
-- Tested against a fixed set of 15 questions before/after every fix: 7/15 flipped from wrong to
-  correct, 0 regressions.
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/CHATBOT.md](docs/CHATBOT.md), [docs/OPERATIONS.md](docs/OPERATIONS.md),
+[docs/DECISIONS.md](docs/DECISIONS.md).
 
-## Local setup
+## The assistant in one minute
+
+- **Numbers come from tools, not from the model.** Ten tested functions (country stats, top tracks and artists, artist and
+  track profiles, comparison, monthly trend, movers, data status) return facts with links to the matching dashboard page.
+- **Verification.** Every figure in an answer must trace back to a tool result (1 % tolerance, or the rounding of a displayed
+  value). One rewrite is attempted, then a visible disclaimer is added.
+- **Guardrails.** Obvious injection and secret requests are refused before any model call. Off-topic questions get a one-line
+  refusal. Track and artist names inside tool results are treated as data, never as instructions.
+- **Honest about gaps.** Markets whose source chart stopped (India since 2026-08-09, Belarus and Israel since March) are flagged
+  in the answer.
+- **Evaluated.** 38 golden questions with expected numbers computed from the raw data by independent SQL: 38 of 38 pass,
+  100 % of answers verified, average 1.7 s, p95 3.5 s (see [docs/CHATBOT.md](docs/CHATBOT.md) for method and caveats).
+
+## Repository map
+
+```
+dashboard/           static site: index.html, app.js (router, pages, charts), chat.js (assistant widget), style.css
+pipeline/            refresh.py (Kaggle to Silver/Gold), build_site_data.py (JSON + chat Parquet), tests
+chatbot/             tools.py, agent.py (LangGraph), llm.py, handler.py (Lambda), Dockerfile, eval/, tests/
+infra/terraform/     S3 buckets, GitHub OIDC role, budget, ECR, Lambda + Function URL, DynamoDB
+.github/workflows/   daily-refresh.yml, chatbot-image.yml
+docs/                architecture, chatbot, operations runbook, decisions, legacy Django notes
+apps/ config/ ...    the original Django app (superseded, kept for history)
+```
+
+## Run it locally
 
 ```bash
-python3.12 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # fill in DJANGO_SECRET_KEY, GOLD_DATABASE_URL, and an LLM key (optional)
-python manage.py migrate
-python manage.py runserver
+# 1. data (one time): build the JSON and chat Parquet from a Silver copy of the lake
+aws s3 sync s3://streampulse-lake-922120357133/silver /tmp/lk/silver
+python pipeline/build_site_data.py --lake /tmp/lk --out /tmp/lk/site_data --chat-out /tmp/lk/chat_data
+
+# 2. the assistant (needs GROQ_API_KEY and/or GEMINI_API_KEY in .env)
+python3 -m venv chatbot/.venv && chatbot/.venv/bin/pip install -r chatbot/requirements.txt
+chatbot/.venv/bin/python chatbot/serve_local.py        # site + chat on http://localhost:8787
+
+# 3. tests and eval
+chatbot/.venv/bin/python -m pytest -q chatbot/tests
+cd pipeline && python -m pytest -q tests
+chatbot/.venv/bin/python chatbot/eval/run_eval.py --data /tmp/lk/chat_data
 ```
 
-Requires Postgres 17 with the `pgvector` extension (`schema.sql` has the full DDL, including
-`gold_chunks`). Without a `GROQ_API_KEY`/`GEMINI_API_KEY` set, the chatbot falls back to a local
-Ollama server (`ollama pull llama3.2:3b`).
+## Cost
 
-## Project layout
+Estimates, not yet confirmed against a full month of billing: Lambda, DynamoDB, CloudWatch and S3 requests sit inside the free
+tier at demo traffic; S3 storage (about 1.5 GB lake, 7 MB site) and one ECR image are cents per month. A gross-usage budget of
+$3 per month (credits not netted out) alerts by email. The LLM calls use free tiers (see Limitations).
 
-```
-apps/
-  core/          landing pages
-  gold_data/     dashboard views over the Gold tables
-  chatbot/       RAG pipeline (rag.py), caching (cache.py), chat API
-  api/           REST API (DRF)
-  documentation/ in-app docs
-  contact/       contact form
-  team/          team page
-scripts/         S3 → Postgres ETL, gold_chunks builder, baseline probe
-config/          Django settings (dev/prod split)
-schema.sql       full Postgres schema, including gold_chunks (pgvector)
-```
+## Limitations
 
-## Deployment
+- **HTTP only.** The site is an S3 website endpoint, which cannot serve HTTPS. CloudFront could not be created on this account.
+  The chat endpoint itself is HTTPS.
+- **Free-tier LLMs.** Groq and Gemini free tiers rate-limit hard. The agent falls back across a chain of models on two providers (four in the Lambda) and waits out short
+  limits, but under load it can answer "busy". There is a per-IP and a daily cap so one visitor cannot exhaust it.
+- **Cold starts.** The first chat question after idle takes about 10 seconds (the Lambda downloads 63 MB of data). Later ones take about 2 seconds.
+- **Source data.** Charts for India, Belarus and Israel stopped in the Kaggle source and are shown as stale. Artist and track
+  detail pages exist for the top 300 artists and top 500 tracks only. Per-country windows in the assistant are limited to 60 days.
+- **Eval caveat.** The golden set is small (38) and two tool bugs were fixed after seeing its failures, so 38 of 38 is optimistic.
+  It should grow with unseen questions.
+- **Concurrency.** The AWS account allows 10 concurrent Lambdas, shared with another project, so a reserved-concurrency cap is not available; limits are enforced in DynamoDB.
 
-Previously deployed on AWS EC2 (`t3.small`, `ap-south-1`, IP-only, no domain/TLS). See
-`STREAMPULSE_FULL_FLOW.md` for the full deployment log, including every real issue hit
-(Python version mismatch, disk space, Postgres version mismatch, `t3.micro` CPU-credit
-exhaustion, static file permissions, `ivfflat` recall drift after index rebuilds) and how each
-was fixed.
+## Provenance
+
+The idea and the original Gold-layer design came out of a team capstone at C-DAC (PGCP-BDA). The serverless pipeline, the dashboard,
+the assistant, the evaluation and the AWS deployment in this repository are my own work. The chart data is the public Kaggle dataset
+`gonzalopezgil/spotify-charts-daily-updated`; Spotify is not affiliated with this project.
+
+The first version of this project (Django, Postgres with pgvector, one EC2 box) is documented in
+[docs/LEGACY_DJANGO.md](docs/LEGACY_DJANGO.md).
