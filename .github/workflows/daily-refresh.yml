@@ -8,13 +8,17 @@ on:
     - cron: "30 3 * * *"   # 03:30 UTC, after Kaggle's daily update
   workflow_dispatch: {}
 
+permissions:
+  id-token: write   # GitHub OIDC -> AWS role (no long-lived keys)
+  contents: read
+
 concurrency:
   group: lake-refresh
   cancel-in-progress: false
 
 env:
-  LAKE_BUCKET: ${{ vars.LAKE_BUCKET }}        # streampulse-lake-dev-data
-  AWS_REGION: ${{ vars.AWS_REGION }}          # ap-south-1
+  LAKE_BUCKET: streampulse-lake-922120357133
+  AWS_REGION: ap-south-1
   KAGGLE_SLUG: gonzalopezgil/spotify-charts-daily-updated
   KAGGLE_FILE: charts_songs_daily.csv
 
@@ -43,8 +47,7 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::922120357133:role/streampulse-github-pipeline
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Pull existing lake (gold + last two months of silver)
