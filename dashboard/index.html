@@ -6,22 +6,24 @@
 <title>StreamPulse - Spotify charts analytics</title>
 <meta name="description" content="Daily Spotify chart analytics across 72 markets: trends, artists, tracks, labels and data health, refreshed every day.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231db954'/%3E%3Cpath d='M5 17h5l3-8 5 15 3-9h6' fill='none' stroke='%23062' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="#/"><span class="logo"></span>StreamPulse</a>
-  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('navopen')">&#9776;</button>
+  <a class="brand" href="#/"><span class="logo"><i class="ph-light ph-pulse"></i></span>StreamPulse</a>
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('navopen')"><i class="ph-light ph-list"></i></button>
   <nav id="nav">
-    <a href="#/" data-r="">Overview</a>
-    <a href="#/map" data-r="map">World map</a>
+    <a href="#/overview" data-r="overview">Overview</a>
+    <a href="#/map" data-r="map">Map</a>
     <a href="#/countries" data-r="countries">Countries</a>
     <a href="#/artists" data-r="artists">Artists</a>
     <a href="#/tracks" data-r="tracks">Tracks</a>
     <a href="#/trending" data-r="trending">Trending</a>
     <a href="#/labels" data-r="labels">Labels</a>
     <a href="#/seasonality" data-r="seasonality">Seasonality</a>
-    <a href="#/health" data-r="health">Data health</a>
+    <a href="#/health" data-r="health">Health</a>
   </nav>
   <span id="asof" class="asof"></span>
 </header>

@@ -127,7 +127,7 @@ function slot(id, el) { document.getElementById(id).replaceChildren(el); }
 // ---------- pages ----------
 const pages = {};
 
-pages[""] = async () => {
+pages.overview = async () => {
   const [meta, ov] = await Promise.all([load("meta.json"), load("overview.json")]);
   mount(`
     <h1>Spotify charts, across 72 markets</h1>
@@ -336,13 +336,155 @@ pages.health = async () => {
   barChart("c1", h.per_day.map((d) => String(d.date).slice(5, 10)), h.per_day.map((d) => d.chart_rows), { tooltip: { callbacks: { label: (c) => `${num(c.parsed.y)} rows` } } });
 };
 
+
+// ---------- home ----------
+const ICON = (n) => `<i class="ph-light ph-${n}"></i>`;
+const nameOf = (t) => esc(String(t.artist_names || "").split("|").join(", "));
+
+pages[""] = async () => {
+  const [meta, ov, tr, cs] = await Promise.all([load("meta.json"), load("overview.json"), load("trending.json"), load("countries.json")]);
+  const year = String(meta.first_date).slice(0, 4);
+  const asof = String(meta.last_date).slice(0, 10);
+  const top = ov.top_tracks[0];
+  const climber = tr.climbers[0];
+  const fresh = tr.new_entries[0];
+  const artist = ov.top_artists[0];
+  const live = cs.filter((c) => c.last30 > 0).sort((a, b) => b.last30 - a.last30);
+  const sum30 = live.reduce((s, c) => s + c.last30, 0);
+  const lead = live[0];
+  const top8 = live.slice(0, 8);
+  const maxv = top8[0].last30;
+  const nowTop = ov.top_tracks.slice(0, 3);
+
+  const rows = [
+    ["overview", "Overview", "Global trends and the biggest tracks now", "chart-line-up"],
+    ["map", "World map", "Every market, coloured by streams", "globe-hemisphere-west"],
+    ["countries", "Countries", "72 markets, side by side", "flag"],
+    ["artists", "Artists", "The top 300 and where they win", "users-three"],
+    ["tracks", "Tracks", "500 songs, day by day", "music-notes"],
+    ["trending", "Trending", "Climbers, new entries and drops", "trend-up"],
+    ["labels", "Labels", "Who owns the charts", "vinyl-record"],
+    ["seasonality", "Seasonality", "When the world listens", "calendar-dots"],
+    ["health", "Data health", "What the pipeline checks every run", "heartbeat"],
+  ];
+  const steps = [
+    ["cloud-arrow-down", "Download", "Every morning a GitHub Actions job pulls the latest top-200 chart files from Kaggle."],
+    ["broom", "Clean", `DuckDB turns ${fmt(meta.chart_rows)} daily chart rows into tidy Silver tables, one market and day at a time.`],
+    ["stack", "Aggregate", "Streams, ranks and trends are summed once, into small files made for the browser."],
+    ["rocket-launch", "Publish", "The files land in S3 on AWS and this site reads them directly. No server runs when you visit."],
+  ];
+
+  mount(`
+  <section class="hero"><div class="wrap">
+    <div>
+      <h1 class="rv">What the world is <em>streaming</em>, every day.</h1>
+      <p class="lead rv" style="--d:80ms">Top-200 charts from ${meta.markets} markets since ${esc(year)}, rebuilt each morning. Browse countries, artists, tracks and breakouts.</p>
+      <div class="cta-row rv" style="--d:160ms">
+        <a class="btn primary" href="#/overview">Open the dashboard <span class="ico">${ICON("arrow-up-right")}</span></a>
+        <a class="btn ghost" href="#/map">World map <span class="ico">${ICON("globe-hemisphere-west")}</span></a>
+      </div>
+    </div>
+    <div class="bezel rv" style="--d:200ms"><div class="core">
+      <div class="hero-chart-h"><b>Charted streams per month</b><span>${esc(String(meta.first_date).slice(0, 7))} to ${esc(String(ov.monthly[ov.monthly.length - 1].ym))}</span></div>
+      <div class="chart"><canvas id="hc" role="img" aria-label="Line chart of charted streams per month across all markets"></canvas></div>
+      <div class="nowlist">${nowTop.map((t, i) => `<a href="#/track/${esc(t.id)}"><span class="r">0${i + 1}</span><span class="t">${esc(t.track_name)}<small>${nameOf(t)}</small></span><span class="v">${fmt(t.streams)}</span></a>`).join("")}</div>
+    </div></div>
+  </div></section>
+
+  <section class="blk"><div class="wrap">
+    <div class="figures">
+      <div class="fig rv"><div class="n" data-count="${meta.streams}" data-fmt="big">0</div><div class="l">streams counted on the charts</div></div>
+      <div class="fig rv" style="--d:70ms"><div class="n" data-count="${meta.tracks}">0</div><div class="l">different tracks have charted</div></div>
+      <div class="fig rv" style="--d:140ms"><div class="n" data-count="${meta.artists}">0</div><div class="l">artists behind them</div></div>
+      <div class="fig rv" style="--d:210ms"><div class="n" data-count="${meta.markets}">0</div><div class="l">markets, from Argentina to Vietnam</div></div>
+    </div>
+  </div></section>
+
+  <section class="blk" style="padding-top:0"><div class="wrap">
+    <h2 class="rv">On the charts right now</h2>
+    <p class="lead rv" style="--d:60ms">Last 30 days across every market, straight from the latest refresh.</p>
+    <div class="bento">
+      <a class="tile t-a rv" href="#/track/${esc(top.id)}"><span class="k">Most streamed track</span><div><div class="big">${esc(top.track_name)}</div><div class="by">${nameOf(top)}</div></div><span class="sm">${fmt(top.streams)} streams</span></a>
+      <a class="tile t-b rv" style="--d:70ms" href="#/track/${esc(climber.id)}"><span class="k">Fastest climber this week</span><div><div class="big">+${Math.round(climber.change_pct)}%</div><div class="by">${esc(climber.track_name)}</div></div></a>
+      <a class="tile t-c rv" style="--d:140ms" href="#/track/${esc(fresh.id)}"><span class="k">Biggest new entry</span><div><div class="big" style="font-size:clamp(22px,2.2vw,30px)">${esc(fresh.track_name)}</div><div class="by">${nameOf(fresh)}</div></div><span class="sm">${fresh.markets} markets in 7 days</span></a>
+      <div class="tile t-d rv" style="--d:100ms"><span class="k">Most streamed artist</span><div><div class="big">${esc(artist.artist)}</div></div><span class="sm">${fmt(artist.streams)} streams</span></div>
+      <a class="tile t-e rv" href="#/country/${esc(lead.market)}"><span class="k">Biggest market</span><div class="big">${esc(lead.country_name)}</div><span class="sm">${(100 * lead.last30 / sum30).toFixed(1)}% of all charted streams</span></a>
+    </div>
+  </div></section>
+
+  <section class="blk" style="padding-top:0"><div class="wrap rank-grid">
+    <div class="stick"><h2 class="rv">Where the world listens</h2><p class="lead rv" style="--d:60ms;margin-bottom:0">The eight biggest markets over the last 30 days. Open any of them for the full story.</p></div>
+    <div>${top8.map((c, i) => `<a class="rk rv" style="--d:${i * 50}ms" href="#/country/${esc(c.market)}"><span class="i">${String(i + 1).padStart(2, "0")}</span><span><span class="nm">${esc(c.country_name)}</span><span class="ln" style="width:${(100 * c.last30 / maxv).toFixed(1)}%"></span></span><span class="vv">${fmt(c.last30)}</span></a>`).join("")}</div>
+  </div></section>
+
+  <section class="blk" style="padding-top:0"><div class="wrap">
+    <h2 class="rv">Everything you can open</h2>
+    <div class="idx" style="margin-top:34px">${rows.map((r, i) => `<a class="rv" style="--d:${i * 40}ms" href="#/${r[0]}">${esc(r[1])} ${ICON("arrow-up-right")}<small>${esc(r[2])}</small></a>`).join("")}</div>
+  </div></section>
+
+  <section class="blk" style="padding-top:0"><div class="wrap flow">
+    <div class="stick"><h2 class="rv">Rebuilt every morning</h2><p class="lead rv" style="--d:60ms;margin-bottom:0">One automated pipeline keeps every number on this site current.</p></div>
+    <div>${steps.map((s, i) => `<div class="fstep rv" style="--d:${i * 70}ms"><div class="ic">${ICON(s[0])}</div><div><h3>${esc(s[1])}</h3><p>${s[2]}</p></div></div>`).join("")}</div>
+  </div></section>
+
+  <section class="final"><div class="wrap">
+    <h2 class="rv">See what is playing.</h2>
+    <div class="cta-row rv" style="--d:100ms"><a class="btn primary" href="#/overview">Open the dashboard <span class="ico">${ICON("arrow-up-right")}</span></a></div>
+    <div class="fdata rv" style="--d:160ms">Data through ${esc(asof)}</div>
+  </div></section>`);
+
+  // hero chart: real monthly series, draws itself in
+  chartDefaults();
+  const ctx = document.getElementById("hc").getContext("2d");
+  const grad = ctx.createLinearGradient(0, 0, 0, 320);
+  grad.addColorStop(0, "rgba(29,185,84,.45)"); grad.addColorStop(1, "rgba(29,185,84,0)");
+  charts.push(new Chart(ctx, {
+    type: "line",
+    data: { labels: ov.monthly.map((m) => m.ym), datasets: [{ label: "Streams", data: ov.monthly.map((m) => m.streams), borderColor: "#1ed760", backgroundColor: grad, fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: { duration: reduced() ? 0 : 1600, easing: "easeOutQuart" },
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: tipFmt },
+      scales: { x: { ticks: { maxTicksLimit: 6 }, grid: { display: false } }, y: Object.assign({ beginAtZero: true, grid: { color: "rgba(255,255,255,.05)" } }, axisFmt) } },
+  }));
+  revealOnScroll();
+  countUp();
+};
+
+function reduced() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+
+let io;
+function revealOnScroll() {
+  const els = document.querySelectorAll(".rv");
+  if (reduced() || !("IntersectionObserver" in window)) { els.forEach((e) => e.classList.add("in")); return; }
+  io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
+  els.forEach((e) => io.observe(e));
+}
+
+function countUp() {
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const end = Number(el.dataset.count), big = el.dataset.fmt === "big";
+    const show = (v) => (big ? fmt(v) : Math.round(v).toLocaleString("en-US"));
+    if (reduced()) { el.textContent = show(end); return; }
+    const obs = new IntersectionObserver((es) => {
+      if (!es[0].isIntersecting) return;
+      obs.disconnect();
+      const t0 = performance.now(), dur = 1400;
+      const tick = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4); el.textContent = show(end * e); if (p < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.4 });
+    obs.observe(el);
+  });
+}
+
 // ---------- router ----------
 async function route() {
   app.dispatchEvent(new Event("route-away"));
   document.body.classList.remove("navopen");
   destroyCharts();
+  if (io) { io.disconnect(); io = null; }
   const [r, arg] = (location.hash.replace(/^#\/?/, "") || "").split("/");
   document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("on", a.dataset.r === (r === "country" ? "countries" : r === "artist" ? "artists" : r === "track" ? "tracks" : r)));
+  app.classList.toggle("home", r === "");
   const page = pages[r];
   try {
     if (!page) { mount('<h1>Not found</h1><p class="sub"><a href="#/">Back to overview</a></p>'); return; }
