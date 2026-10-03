@@ -113,6 +113,11 @@ resource "aws_lambda_function" "chat" {
     }
   }
   depends_on = [aws_cloudwatch_log_group.chat, aws_iam_role_policy.chat]
+
+  # CI (chatbot-image.yml) rolls the function to each new image tag; Terraform must not fight it.
+  lifecycle {
+    ignore_changes = [image_uri]
+  }
 }
 
 resource "aws_lambda_function_url" "chat" {
