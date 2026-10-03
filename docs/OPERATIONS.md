@@ -20,14 +20,14 @@ Needs: AWS CLI configured for the account, Terraform 1.6+, GitHub CLI, and the r
 ```bash
 cd infra/terraform
 terraform init
-terraform apply                       # buckets, OIDC role, budget, ECR, DynamoDB, Lambda role  (12 + 7 resources)
+terraform apply -var deploy_chat=false # buckets, OIDC role, budget, ECR, DynamoDB, Lambda role (the Lambda needs an image first)
 
 bash chatbot/set_secrets.sh           # copies GROQ_API_KEY / GEMINI_API_KEY from .env into SSM SecureString
 
 gh workflow run daily-refresh.yml     # first run on an empty Bronze loads the full history from Kaggle (Bronze, Silver, Gold)
 gh workflow run chatbot-image.yml     # builds and pushes the image
 
-terraform apply -var deploy_chat=true # Lambda + Function URL; prints chat_url
+terraform apply                       # Lambda + Function URL (deploy_chat now defaults to true); prints chat_url
 # put chat_url in dashboard/config.js as window.SP_API, commit, push (the workflow publishes it)
 ```
 
@@ -42,7 +42,7 @@ The Lambda is created in a second step because it cannot exist before an image i
 | Inspect a corrected row | read `bronze/charts/` with `hive_partitioning=1` and look at the same (date, country, uri) across `_ingest_date`; Bronze keeps every version, Silver only the latest |
 | Deploy a dashboard change | commit and push to `main`; the next daily run publishes it. For an immediate update also run `aws s3 sync dashboard s3://streampulse-site-922120357133 --exclude "data/*"`. **Always commit first** (see Troubleshooting) |
 | Deploy a chatbot change | push to `main`; `chatbot-image` rebuilds and updates the Lambda |
-| Change a rate limit | edit `IP_PER_HOUR` / `GLOBAL_PER_DAY` in `infra/terraform/chatbot.tf`, `terraform apply -var deploy_chat=true` |
+| Change a rate limit | edit `IP_PER_HOUR` / `GLOBAL_PER_DAY` in `infra/terraform/chatbot.tf`, `terraform apply` |
 | Rotate an LLM key | update `.env`, run `bash chatbot/set_secrets.sh`; warm Lambdas pick it up on their next cold start (force one by updating the function code or config) |
 | Run the evaluation | `chatbot/.venv/bin/python chatbot/eval/run_eval.py --data /tmp/lk/chat_data`; regenerate `golden.json` with `make_golden.py` after the data moves on |
 | Local preview of site plus chat | `chatbot/.venv/bin/python chatbot/serve_local.py` then open `http://localhost:8787` |
@@ -85,7 +85,7 @@ The Lambda is created in a second step because it cannot exist before an image i
 - **Bad deploy of the chat image:** re-run `chatbot-image` from an earlier commit (`workflow_dispatch` on that ref), or point the function at an
   older tag: `aws lambda update-function-code --function-name streampulse-chat --image-uri <repo>:<sha12>`. The last 5 images are kept.
 - **Chat misbehaving or too costly:** disable the widget by emptying `window.SP_API` in `dashboard/config.js` (push, then sync), or throttle by lowering
-  `GLOBAL_PER_DAY`. As a last resort delete the Function URL (`terraform apply -var deploy_chat=false` removes the Lambda and URL).
+  `GLOBAL_PER_DAY`. As a last resort delete the Function URL (`terraform apply -var deploy_chat=false` removes the Lambda and URL; never run a plain apply after that without setting it back).
 - **Terraform state** is local (`infra/terraform/terraform.tfstate`, not in Git). Back it up; without it, resources must be imported.
 
 ## 7. Tear down
@@ -94,7 +94,7 @@ The Lambda is created in a second step because it cannot exist before an image i
 cd infra/terraform
 aws s3 rm s3://streampulse-site-922120357133 --recursive
 aws s3 rm s3://streampulse-lake-922120357133 --recursive
-terraform destroy -var deploy_chat=true
+terraform destroy
 aws ssm delete-parameter --name /streampulse/groq_api_key
 aws ssm delete-parameter --name /streampulse/gemini_api_key
 ```

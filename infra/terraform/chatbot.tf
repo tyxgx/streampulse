@@ -1,15 +1,19 @@
 # Chatbot backend: ECR image -> Lambda (Function URL) + DynamoDB rate limiter.
-# Two-step apply: first with deploy_chat=false (ECR, role, table), push the image
-# from CI, then `terraform apply -var deploy_chat=true`.
+# The chat Lambda needs an image in ECR first. On a brand-new account: `terraform apply -var deploy_chat=false`
+# (ECR, role, table), let CI push the image, then plain `terraform apply`.
+# deploy_chat defaults to TRUE because the Lambda is live: with a false default, any normal `terraform apply`
+# would plan to DESTROY the Lambda and its public URL.
 
 variable "deploy_chat" {
   description = "Create the Lambda + Function URL (needs an image in ECR first)."
   type        = bool
-  default     = false
+  default     = true
 }
 
 locals {
   site_origin = "http://${aws_s3_bucket_website_configuration.site.website_endpoint}"
+  # the S3 REST endpoint serves the same site over HTTPS (the website endpoint is HTTP only)
+  site_https_origin = "https://${aws_s3_bucket.site.bucket_regional_domain_name}"
 }
 
 resource "aws_ecr_repository" "chat" {
@@ -116,7 +120,7 @@ resource "aws_lambda_function_url" "chat" {
   function_name      = aws_lambda_function.chat[0].function_name
   authorization_type = "NONE"
   cors {
-    allow_origins = [local.site_origin, "http://localhost:8787"]
+    allow_origins = [local.site_origin, local.site_https_origin, "http://localhost:8787"]
     allow_methods = ["GET", "POST"]
     allow_headers = ["content-type"]
     max_age       = 3600
