@@ -1,5 +1,7 @@
 # StreamPulse
 
+[![ci](https://github.com/tyxgx/streampulse/actions/workflows/ci.yml/badge.svg)](https://github.com/tyxgx/streampulse/actions/workflows/ci.yml) [![daily-refresh](https://github.com/tyxgx/streampulse/actions/workflows/daily-refresh.yml/badge.svg)](https://github.com/tyxgx/streampulse/actions/workflows/daily-refresh.yml) [![license: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 Daily Spotify chart analytics for 72 markets, served as a static dashboard plus a grounded chat assistant. It runs
 serverless on AWS, refreshes itself every morning, and costs a few dollars a month at most.
 
@@ -72,8 +74,8 @@ dashboard/           static site: index.html, app.js (router, pages, charts), ch
 pipeline/            refresh.py (Kaggle to Bronze, Silver, Gold), build_site_data.py (JSON + chat Parquet), tests
 chatbot/             tools.py, agent.py (LangGraph), llm.py, handler.py (Lambda), Dockerfile, eval/, tests/
 infra/terraform/     S3 buckets, GitHub OIDC role, budget, ECR, Lambda + Function URL, DynamoDB
-.github/workflows/   daily-refresh.yml, chatbot-image.yml
-docs/                architecture, chatbot, operations runbook, decisions, legacy Django notes
+.github/workflows/   ci.yml (tests, terraform validate, JS check), daily-refresh.yml, chatbot-image.yml; dependabot.yml
+docs/                architecture, chatbot, operations runbook, decisions, legacy Django notes, archive/ (old reports and baselines)
 apps/ config/ ...    the original Django app (superseded, kept for history)
 ```
 
@@ -120,4 +122,6 @@ the assistant, the evaluation and the AWS deployment in this repository are my o
 `gonzalopezgil/spotify-charts-daily-updated`; Spotify is not affiliated with this project.
 
 The first version of this project (Django, Postgres with pgvector, one EC2 box) is documented in
-[docs/LEGACY_DJANGO.md](docs/LEGACY_DJANGO.md).
+[docs/LEGACY_DJANGO.md](docs/LEGACY_DJANGO.md); the audits, logs and regression baselines from that version are in [docs/archive](docs/archive).
+
+Licensed under the [MIT License](LICENSE). Security notes: [SECURITY.md](SECURITY.md).

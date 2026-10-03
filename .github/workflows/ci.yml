@@ -1,0 +1,58 @@
+name: ci
+
+# Fast checks on every push and pull request. (daily-refresh also runs the pipeline tests before touching data;
+# the LLM evaluation is not here because it needs provider keys and is rate limited.)
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt}
+      - run: pip install -r pipeline/requirements.txt pytest
+      - run: python -m pytest -q pipeline/tests
+
+  chatbot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip, cache-dependency-path: chatbot/requirements.txt}
+      - run: pip install -r chatbot/requirements.txt
+      - name: Unit tests (data-dependent tests skip when the chat tables are absent)
+        run: python -m pytest -q chatbot/tests
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Format, init (no backend, no credentials), validate
+        working-directory: infra/terraform
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - name: JavaScript syntax check
+        run: |
+          node --check dashboard/app.js
+          node --check dashboard/chat.js

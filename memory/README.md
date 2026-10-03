@@ -1,7 +1,7 @@
 # Session Memory
 
 Date-stamped logs of what a Claude Code session actually did on this repo — separate from the
-`RAG_*.md`/`STREAMPULSE_FULL_FLOW.md` docs at the repo root (which document the *shipped*
+`RAG_*.md`/`../docs/archive/STREAMPULSE_FULL_FLOW.md` docs at the repo root (which document the *shipped*
 architecture/engineering story). This folder is a working log: what was found, what was fixed,
 what's still open, and exactly what state the repo/EC2 deployment was left in.
 

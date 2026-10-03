@@ -98,7 +98,7 @@ schema.sql       full Postgres schema, including gold_chunks (pgvector)
 ## Deployment
 
 Previously deployed on AWS EC2 (`t3.small`, `ap-south-1`, IP-only, no domain/TLS). See
-`STREAMPULSE_FULL_FLOW.md` for the full deployment log, including every real issue hit
+`archive/STREAMPULSE_FULL_FLOW.md` for the full deployment log, including every real issue hit
 (Python version mismatch, disk space, Postgres version mismatch, `t3.micro` CPU-credit
 exhaustion, static file permissions, `ivfflat` recall drift after index rebuilds) and how each
 was fixed.

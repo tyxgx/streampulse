@@ -2,6 +2,10 @@
 
 Everything needed to deploy, run, monitor, fix and tear down StreamPulse. Region is `ap-south-1`, account `922120357133`.
 
+## 0. Checks on every push and pull request
+
+`ci.yml` runs the pipeline tests, the chatbot unit tests (data-dependent ones skip), `terraform fmt -check` plus `terraform validate` (no credentials needed) and a JavaScript syntax check of the dashboard. `dependabot.yml` opens grouped weekly updates for Python, monthly for Docker, Actions and Terraform; `duckdb` is deliberately ignored while it is pinned. The LLM evaluation is run by hand because it needs provider keys.
+
 ## 1. What runs on its own
 
 | What | When | Where | Result |
@@ -47,6 +51,7 @@ The Lambda is created in a second step because it cannot exist before an image i
 | Run the evaluation | `chatbot/.venv/bin/python chatbot/eval/run_eval.py --data /tmp/lk/chat_data`; regenerate `golden.json` with `make_golden.py` after the data moves on |
 | Local preview of site plus chat | `chatbot/.venv/bin/python chatbot/serve_local.py` then open `http://localhost:8787` |
 | Rebuild local data | see "Run it locally" in the README |
+| Back up the Terraform state | `bash scripts/backup_tfstate.sh` after every `terraform apply` (the state is gitignored and exists only on the laptop; this copies it to `~/job/backups/terraform-state/streampulse/` and a private S3 object `_backups/terraform/<timestamp>/`) |
 
 ## 4. Monitoring and where to look
 
@@ -86,7 +91,7 @@ The Lambda is created in a second step because it cannot exist before an image i
   older tag: `aws lambda update-function-code --function-name streampulse-chat --image-uri <repo>:<sha12>`. The last 5 images are kept.
 - **Chat misbehaving or too costly:** disable the widget by emptying `window.SP_API` in `dashboard/config.js` (push, then sync), or throttle by lowering
   `GLOBAL_PER_DAY`. As a last resort delete the Function URL (`terraform apply -var deploy_chat=false` removes the Lambda and URL; never run a plain apply after that without setting it back).
-- **Terraform state** is local (`infra/terraform/terraform.tfstate`, not in Git). Back it up; without it, resources must be imported.
+- **Terraform state** is local (`infra/terraform/terraform.tfstate`, not in Git). `scripts/backup_tfstate.sh` keeps timestamped copies locally and in the private lake bucket; to restore, copy one back to `infra/terraform/terraform.tfstate`. Without any copy, resources would have to be imported one by one.
 
 ## 7. Tear down
 

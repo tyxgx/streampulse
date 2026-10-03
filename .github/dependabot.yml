@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /pipeline
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: duckdb   # pinned: 1.5.6 hits an INTERNAL optimizer error, revisit manually
+    groups:
+      pipeline-deps: {patterns: ["*"], update-types: [minor, patch]}
+  - package-ecosystem: pip
+    directory: /chatbot
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: duckdb
+    groups:
+      chatbot-deps: {patterns: ["*"], update-types: [minor, patch]}
+  - package-ecosystem: docker
+    directory: /chatbot
+    schedule: {interval: monthly}
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: {interval: monthly}
+    groups:
+      actions: {patterns: ["*"]}
+  - package-ecosystem: terraform
+    directory: /infra/terraform
+    schedule: {interval: monthly}
