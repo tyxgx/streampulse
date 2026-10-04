@@ -336,6 +336,35 @@ pages.seasonality = async () => {
   lineChart("c2", s.month.map((r) => mons[r.month - 1]), [{ label: "Index", data: s.month.map((r) => r.index) }], { tooltip: idx, scales: { y: { beginAtZero: false, ticks: { callback: (v) => v } } } });
 };
 
+pages.how = async () => {
+  const [m, h] = await Promise.all([load("meta.json"), load("health.json")]);
+  const day = (d) => esc(String(d).slice(0, 10));
+  const passing = h.checks.filter((c) => c.ok).length;
+  const gaps = h.stale_markets.map((x) => `${esc(x.country_name)} (streams through ${day(x.last_date)})`).join(", ");
+  const step = (t, d) => `<li><strong>${t}</strong><span>${d}</span></li>`;
+  mount(`<h1>How it works</h1>
+    <p class="sub">From a public chart file to the pages you are looking at. Nothing here is mocked: the numbers below are read from the live data.</p>
+    <div class="how">
+      <div class="card"><h2><span class="n">1</span>Where the data comes from</h2>
+        <p>A public Kaggle dataset, <a href="https://www.kaggle.com/datasets/gonzalopezgil/spotify-charts-daily-updated" target="_blank" rel="noopener">spotify-charts-daily-updated</a>, which republishes Spotify's daily top-200 chart of every market.
+        It holds <strong>${num(m.chart_rows)}</strong> chart rows for <strong>${m.markets}</strong> markets, <strong>${day(m.first_date)}</strong> to <strong>${day(m.last_date)}</strong>.</p>
+        <p class="muted">"Streams" means charted streams: the streams of tracks that were on a market's top-200 that day, not total Spotify streams.${gaps ? ` Gaps come from the source file itself: ${gaps}.` : ""}</p></div>
+      <div class="card"><h2><span class="n">2</span>How it is processed</h2>
+        <ol class="how-steps">
+          ${step("Download", "A scheduled job (GitHub Actions) fetches the file every morning, 03:30 UTC.")}
+          ${step("Bronze: raw, never overwritten", "Only new or changed rows are added, each with the date and file it came from. Corrections are kept as versions.")}
+          ${step("Silver: cleaned", "Duplicates and unmapped markets are dropped. Silver is rebuilt from Bronze, so it can always be replayed from scratch.")}
+          ${step("Gold: summed", "Monthly totals per market, track and artist. Every run checks that Gold adds up to Silver.")}
+          ${step("Site files", "Small JSON files for the pages, and a compact table for the chatbot. Visitors never trigger a query.")}
+        </ol>
+        <p class="muted">Last refresh: ${esc(String(m.generated_at).replace("T", " ").slice(0, 16))} UTC &middot; <a href="#/health">${passing} of ${h.checks.length} data checks passing</a></p></div>
+      <div class="card"><h2><span class="n">3</span>How it is shown</h2>
+        <p><strong>The pages</strong> are plain HTML and JavaScript on S3 that read those JSON files and draw the charts in your browser. No server runs while you browse.</p>
+        <p><strong>The chatbot</strong> ("Ask StreamPulse") works differently: a model picks from eleven fixed data tools, the tools run SQL on the data, and the model only writes the sentence. A checker then rejects any number the tools did not return.</p>
+        <p class="muted">Runs on AWS (S3, Lambda, DynamoDB), set up with Terraform. <a href="https://github.com/tyxgx/streampulse" target="_blank" rel="noopener">Source and docs on GitHub</a>.</p></div>
+    </div>`);
+};
+
 pages.health = async () => {
   const h = await load("health.json");
   mount(`<h1>Data health</h1><p class="sub">Checks run on every refresh. Latest chart day: ${esc(String(h.as_of).slice(0, 10))}.</p>
@@ -378,6 +407,7 @@ pages[""] = async () => {
     ["labels", "Labels", "Who owns the charts", "vinyl-record"],
     ["seasonality", "Seasonality", "When the world listens", "calendar-dots"],
     ["health", "Data health", "What the pipeline checks every run", "heartbeat"],
+    ["how", "How it works", "Where the data comes from and how it is processed", "info"],
   ];
   const steps = [
     ["cloud-arrow-down", "Download", "Every morning a GitHub Actions job pulls the latest top-200 chart files from Kaggle."],

@@ -210,3 +210,14 @@ a.tile:hover{transform:translateY(-4px);color:inherit}
 .rk-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rk-t small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
 .rk-v{font:12px var(--mono);color:var(--accent-hi);white-space:nowrap}
 @media (max-width:520px){.chartlist li{grid-template-columns:24px 1fr}.rk-v{display:none}}
+
+/* How it works */
+.how{display:grid;gap:14px;max-width:820px}
+.how h2{display:flex;align-items:center;gap:10px}
+.how .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--accent-hi);font:500 12px var(--mono)}
+.how p{margin:0 0 10px;line-height:1.6}.how p:last-child{margin-bottom:0}
+.how a{color:var(--accent-hi)}
+.how-steps{list-style:none;margin:0 0 12px;padding:0;counter-reset:s}
+.how-steps li{display:grid;gap:2px;padding:10px 0 10px 18px;border-left:1px solid var(--line);position:relative}
+.how-steps li::before{content:"";position:absolute;left:-4px;top:17px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.how-steps strong{font-weight:600}.how-steps span{color:var(--muted);font-size:14px;line-height:1.5}
