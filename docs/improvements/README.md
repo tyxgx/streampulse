@@ -16,12 +16,13 @@ Steps marked **apply** need a `terraform apply` run by the owner (the agent envi
 | # | Step | Kind | Status |
 |---|---|---|---|
 | 01 | [AWS cost and consumption audit](01-aws-cost-audit.md) | audit | done 2026-10-04 |
-| 02 | Public "Quality" page: the 41-question evaluation, published | feature | planned |
-| 03 | Bar-chart race: top artists month by month, and a map time slider | feature | planned |
-| 04 | Pipeline history page: rows appended, duration, lineage per run | feature | planned |
-| 05 | Collaboration network (artists who chart together) | feature | planned |
-| 06 | Compare mode (two countries or two artists) | feature | planned |
-| 07 | Chat: inline mini charts and streamed answers | feature | planned |
-| 08 | CloudWatch alarms and a synthetic endpoint check | infra, **apply** | planned |
+| 02 | [Plain "How it works" page](02-how-it-works-page.md): data source, processing, how it is shown | feature | done and live 2026-10-04 |
+| 03 | Public "Quality" page: the 41-question evaluation, published | feature | planned |
+| 04 | Bar-chart race: top artists month by month, and a map time slider | feature | planned |
+| 05 | Pipeline history page: rows appended, duration, lineage per run | feature | planned |
+| 06 | Collaboration network (artists who chart together) | feature | planned |
+| 07 | Compare mode (two countries or two artists) | feature | planned |
+| 08 | Chat: inline mini charts and streamed answers | feature | planned |
+| 09 | CloudWatch alarms and a synthetic endpoint check | infra, **apply** | planned |
 
 Rule for every step: change one thing, verify it for real (browser or test), write the result here, and keep a rollback.
